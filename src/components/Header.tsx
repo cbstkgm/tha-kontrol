@@ -58,6 +58,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, baseLayer, set
           <Database size={18} />
           Tescil Edilen THA'lar
         </button>
+        {/* Veri Yükleme alanını geçici olarak gizledik
         <button
           className={`nav-btn ${activeTab === 'upload' ? 'active' : ''}`}
           onClick={() => setActiveTab('upload')}
@@ -65,6 +66,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, baseLayer, set
           <Upload size={18} />
           Veri Yükleme
         </button>
+        */}
         <button
           className="nav-btn"
           onClick={onOpenSqlModal}
