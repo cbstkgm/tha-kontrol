@@ -47,7 +47,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
       sortableItems.sort((a, b) => {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
-        
+
         if (aValue === null || aValue === undefined) aValue = '';
         if (bValue === null || bValue === undefined) bValue = '';
 
@@ -128,6 +128,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     { key: 'kad_basvuru_olusturmatarihi', label: 'Kad. Başvuru Tarihi' },
     { key: 'kad_fenkayitno', label: 'Kad. Fen Kayıt No' },
     { key: 'kad_fenkayittarih', label: 'Kad. Fen Kayıt Tarihi' },
+    { key: 'basvuru_asama_durum', label: 'Aşama Durumu' },
     { key: 'tescilyevmiyeno', label: 'Tescil Yevmiye No' },
     { key: 'tesciltarih', label: 'Tescil Tarihi' },
     { key: 'olusanparselid', label: 'Oluşan Parsel ID' },
@@ -148,6 +149,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     { key: 'kad_basvurualinmatarihi', label: 'Kad. Başvuru Tarihi' },
     { key: 'kad_fenkayitno', label: 'Kad. Fen Kayıt No' },
     { key: 'kad_fenkayittarih', label: 'Kad. Fen Kayıt Tarihi' },
+    { key: 'basvuru_asama_durum', label: 'Aşama Durumu' },
     { key: 'tapu_tesciltarih', label: 'Tescil Tarihi' },
     { key: 'tapu_tescilyevmiyeno', label: 'Tescil Yevmiye No' }
   ];
@@ -173,7 +175,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   if (data.length === 0) {
     return (
       <div className="empty-state glass-panel">
-        <p>Henüz veri yüklenmedi. Lütfen 'Veri Yükleme' sekmesinden veri yükleyin.</p>
+        <p>Veri Yükleniyor Bekleyin...</p>
       </div>
     );
   }
@@ -215,8 +217,8 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                 </div>
               </th>
               {columns.map(col => (
-                <th 
-                  key={col.key} 
+                <th
+                  key={col.key}
                   onClick={() => requestSort(col.key)}
                   style={{ cursor: 'pointer', userSelect: 'none' }}
                   title="Sıralamak için tıklayın"
