@@ -42,8 +42,16 @@ function App() {
 
   const [thaData, setThaData] = useState<ThaRecord[]>([]);
   const [mukerrerData, setMukerrerData] = useState<MukerrerRecord[]>([]);
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllGeometries, setShowAllGeometries] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [searchInput]);
 
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [checkedRowIds, setCheckedRowIds] = useState<Set<string>>(new Set());
@@ -345,8 +353,8 @@ function App() {
         setActiveTab={handleTabChange}
         baseLayer={baseLayer}
         setBaseLayer={setBaseLayer}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        searchQuery={searchInput}
+        setSearchQuery={setSearchInput}
         onOpenSqlModal={() => setIsSqlModalOpen(true)}
       />
 
