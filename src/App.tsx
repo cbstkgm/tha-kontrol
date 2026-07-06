@@ -84,7 +84,9 @@ function App() {
     if (!searchQuery) return thaData;
     const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
     return thaData.filter(row =>
-      Object.values(row).some(val => val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery))
+      Object.entries(row).some(([key, val]) => 
+        !key.includes('geom') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery)
+      )
     );
   }, [thaData, searchQuery]);
 
@@ -92,7 +94,9 @@ function App() {
     if (!searchQuery) return mukerrerData;
     const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
     return mukerrerData.filter(row =>
-      Object.values(row).some(val => val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery))
+      Object.entries(row).some(([key, val]) => 
+        !key.includes('geom') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery)
+      )
     );
   }, [mukerrerData, searchQuery]);
 
