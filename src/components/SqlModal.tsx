@@ -32,7 +32,7 @@ SELECT
 		when '8' then 'ZamanAsiminaUgradi'
 		when '9' then 'Onaylanmadi'
 		when '10' then 'Tescilden Geldi'
-		when '11' then 'Tescilden İçin Onaya Gönderildi'
+		when '11' then 'Tescil İçin Onaya Gönderildi'
 	end as "basvuru_asama_durum",
     tbl2.tesciltarih as tapu_tesciltarih,
     tbl2.tescilyevmiyeno as tapu_tescilyevmiyeno,
@@ -98,7 +98,7 @@ SELECT
 		when '8' then 'ZamanAsiminaUgradi'
 		when '9' then 'Onaylanmadi'
 		when '10' then 'Tescilden Geldi'
-		when '11' then 'Tescilden İçin Onaya Gönderildi'
+		when '11' then 'Tescil İçin Onaya Gönderildi'
 	end as "basvuru_asama_durum",
     tbl2.tescilyevmiyeno,
     tbl2.tesciltarih,
