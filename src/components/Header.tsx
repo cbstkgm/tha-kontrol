@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ViewTab, MapBaseLayer } from '../types';
-import { Layers, Upload, Database, ChevronDown, Search, Code } from 'lucide-react';
+import { Layers, Database, ChevronDown, Search, Code } from 'lucide-react';
 import AnimatedLogo from './AnimatedLogo';
 import './Header.css';
 
