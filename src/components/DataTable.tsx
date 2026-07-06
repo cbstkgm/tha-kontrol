@@ -48,6 +48,11 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
 
+        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && aValue === undefined) aValue = a['tesciltarih'] || a['tapu_tesciltarih'];
+        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && bValue === undefined) bValue = b['tesciltarih'] || b['tapu_tesciltarih'];
+        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && aValue === undefined) aValue = a['tescilyevmiyeno'] || a['tapu_tescilyevmiyeno'];
+        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && bValue === undefined) bValue = b['tescilyevmiyeno'] || b['tapu_tescilyevmiyeno'];
+
         if (aValue === null || aValue === undefined) aValue = '';
         if (bValue === null || bValue === undefined) bValue = '';
 
@@ -261,7 +266,16 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                       <span className="no-geom">-</span>
                     )}
                   </td>
-                  {columns.map(col => <td key={col.key}>{row[col.key]}</td>)}
+                  {columns.map(col => {
+                    let val = row[col.key];
+                    if ((col.key === 'tesciltarih' || col.key === 'tapu_tesciltarih') && val === undefined) {
+                      val = row['tesciltarih'] || row['tapu_tesciltarih'];
+                    }
+                    if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && val === undefined) {
+                      val = row['tescilyevmiyeno'] || row['tapu_tescilyevmiyeno'];
+                    }
+                    return <td key={col.key}>{val}</td>;
+                  })}
                 </tr>
               );
             })}
