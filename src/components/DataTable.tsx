@@ -53,6 +53,14 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && aValue === undefined) aValue = a['tescilyevmiyeno'] || a['tapu_tescilyevmiyeno'];
         if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && bValue === undefined) bValue = b['tescilyevmiyeno'] || b['tapu_tescilyevmiyeno'];
 
+        if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(sortConfig.key)) {
+           const aStatus = (a['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
+           const bStatus = (b['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
+           const allowed = ['onaylandı', 'onaylandi', 'tescilden geldi', 'onay bekliyor', 'tamamlandı', 'tamamlandi'];
+           if (!allowed.includes(aStatus)) aValue = '';
+           if (!allowed.includes(bStatus)) bValue = '';
+        }
+
         if (aValue === null || aValue === undefined) aValue = '';
         if (bValue === null || bValue === undefined) bValue = '';
 
@@ -274,6 +282,15 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                     if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && val === undefined) {
                       val = row['tescilyevmiyeno'] || row['tapu_tescilyevmiyeno'];
                     }
+
+                    if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(col.key)) {
+                      const status = (row['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
+                      const allowed = ['onaylandı', 'onaylandi', 'tescilden geldi', 'onay bekliyor', 'tamamlandı', 'tamamlandi'];
+                      if (!allowed.includes(status)) {
+                        val = '';
+                      }
+                    }
+
                     return <td key={col.key}>{val}</td>;
                   })}
                 </tr>
