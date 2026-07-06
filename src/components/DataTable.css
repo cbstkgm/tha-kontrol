@@ -42,6 +42,36 @@
   color: var(--text-secondary);
 }
 
+.table-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-excel-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #107c41; /* Excel green */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-excel-btn:hover {
+  background-color: #0b5c30;
+  transform: translateY(-1px);
+}
+
+.export-excel-btn:active {
+  transform: translateY(0);
+}
+
 .page-size-selector select {
   padding: 4px 8px;
   border-radius: 6px;
@@ -275,6 +305,15 @@
   .page-size-selector select {
     padding: 4px 6px;
     font-size: 0.85rem;
+  }
+  
+  .export-text {
+    display: none;
+  }
+  
+  .export-excel-btn {
+    padding: 6px;
+    border-radius: 6px;
   }
   
   .table-footer {

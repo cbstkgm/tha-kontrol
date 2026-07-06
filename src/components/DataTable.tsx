@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import './DataTable.css';
 
 interface DataTableProps {
@@ -127,6 +128,37 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     setCurrentPage(1); // Reset to first page
   };
 
+  const handleExportExcel = () => {
+    const exportData = data.map(row => {
+      const newRow: any = {};
+      columns.forEach(col => {
+        let val = row[col.key];
+        if ((col.key === 'tesciltarih' || col.key === 'tapu_tesciltarih') && (val === undefined || val === null || val === '')) {
+          val = row['tesciltarih'] ?? row['tapu_tesciltarih'] ?? row['taputesciltarih'] ?? val;
+        }
+        if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && (val === undefined || val === null || val === '')) {
+          val = row['tescilyevmiyeno'] ?? row['tapu_tescilyevmiyeno'] ?? row['taputescilyevmiyeno'] ?? row['yevmiyeno'] ?? val;
+        }
+
+        if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(col.key)) {
+          const status = (row['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
+          const allowed = ['onaylandı', 'onaylandi', 'tescilden geldi', 'onay bekliyor', 'tamamlandı', 'tamamlandi'];
+          if (!allowed.includes(status)) {
+            val = '';
+          }
+        }
+        newRow[col.label] = val;
+      });
+      return newRow;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Veriler");
+    const fileName = type === 'tha' ? 'tescil_edilen_thalar.xlsx' : 'mukerrer_parseller.xlsx';
+    XLSX.writeFile(workbook, fileName);
+  };
+
   const mukerrerColumns = [
     { key: 'ilad', label: 'İl' },
     { key: 'ilcead', label: 'İlçe' },
@@ -201,16 +233,23 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
           <span className="badge">{data.length} Kayıt</span>
         </div>
 
-        <div className="page-size-selector">
-          <label>Kayıt Sayısı: </label>
-          <select value={pageSize} onChange={handlePageSizeChange} disabled={isMobile}>
-            {isMobile && <option value={pageSize}>Otomatik ({pageSize})</option>}
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-            <option value={250}>250</option>
-            <option value={500}>500</option>
-          </select>
+        <div className="table-header-actions">
+          <button className="export-excel-btn" onClick={handleExportExcel} title="Excel Olarak İndir">
+            <Download size={16} />
+            <span className="export-text">Excel İndir</span>
+          </button>
+
+          <div className="page-size-selector">
+            <label>Kayıt Sayısı: </label>
+            <select value={pageSize} onChange={handlePageSizeChange} disabled={isMobile}>
+              {isMobile && <option value={pageSize}>Otomatik ({pageSize})</option>}
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={250}>250</option>
+              <option value={500}>500</option>
+            </select>
+          </div>
         </div>
       </div>
 
