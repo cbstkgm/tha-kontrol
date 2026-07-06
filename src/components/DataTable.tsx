@@ -48,10 +48,10 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
 
-        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && aValue === undefined) aValue = a['tesciltarih'] || a['tapu_tesciltarih'];
-        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && bValue === undefined) bValue = b['tesciltarih'] || b['tapu_tesciltarih'];
-        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && aValue === undefined) aValue = a['tescilyevmiyeno'] || a['tapu_tescilyevmiyeno'];
-        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && bValue === undefined) bValue = b['tescilyevmiyeno'] || b['tapu_tescilyevmiyeno'];
+        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && (aValue === undefined || aValue === null || aValue === '')) aValue = a['tesciltarih'] ?? a['tapu_tesciltarih'] ?? a['taputesciltarih'] ?? aValue;
+        if ((sortConfig.key === 'tesciltarih' || sortConfig.key === 'tapu_tesciltarih') && (bValue === undefined || bValue === null || bValue === '')) bValue = b['tesciltarih'] ?? b['tapu_tesciltarih'] ?? b['taputesciltarih'] ?? bValue;
+        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && (aValue === undefined || aValue === null || aValue === '')) aValue = a['tescilyevmiyeno'] ?? a['tapu_tescilyevmiyeno'] ?? a['taputescilyevmiyeno'] ?? a['yevmiyeno'] ?? aValue;
+        if ((sortConfig.key === 'tescilyevmiyeno' || sortConfig.key === 'tapu_tescilyevmiyeno') && (bValue === undefined || bValue === null || bValue === '')) bValue = b['tescilyevmiyeno'] ?? b['tapu_tescilyevmiyeno'] ?? b['taputescilyevmiyeno'] ?? b['yevmiyeno'] ?? bValue;
 
         if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(sortConfig.key)) {
            const aStatus = (a['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
@@ -276,11 +276,11 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                   </td>
                   {columns.map(col => {
                     let val = row[col.key];
-                    if ((col.key === 'tesciltarih' || col.key === 'tapu_tesciltarih') && val === undefined) {
-                      val = row['tesciltarih'] || row['tapu_tesciltarih'];
+                    if ((col.key === 'tesciltarih' || col.key === 'tapu_tesciltarih') && (val === undefined || val === null || val === '')) {
+                      val = row['tesciltarih'] ?? row['tapu_tesciltarih'] ?? row['taputesciltarih'] ?? val;
                     }
-                    if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && val === undefined) {
-                      val = row['tescilyevmiyeno'] || row['tapu_tescilyevmiyeno'];
+                    if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && (val === undefined || val === null || val === '')) {
+                      val = row['tescilyevmiyeno'] ?? row['tapu_tescilyevmiyeno'] ?? row['taputescilyevmiyeno'] ?? row['yevmiyeno'] ?? val;
                     }
 
                     if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(col.key)) {
