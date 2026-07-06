@@ -84,9 +84,10 @@ function App() {
     if (!searchQuery) return thaData;
     const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
     return thaData.filter(row =>
-      Object.entries(row).some(([key, val]) => 
-        !key.includes('geom') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery)
-      )
+      Object.entries(row).some(([key, val]) => {
+        const k = key.toLowerCase();
+        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery);
+      })
     );
   }, [thaData, searchQuery]);
 
@@ -94,9 +95,10 @@ function App() {
     if (!searchQuery) return mukerrerData;
     const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
     return mukerrerData.filter(row =>
-      Object.entries(row).some(([key, val]) => 
-        !key.includes('geom') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery)
-      )
+      Object.entries(row).some(([key, val]) => {
+        const k = key.toLowerCase();
+        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery);
+      })
     );
   }, [mukerrerData, searchQuery]);
 
