@@ -401,7 +401,7 @@ function App() {
       <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
         CBS Şube Müdürlüğü @2026 
         <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
-        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fcbstkgm.github.io%2Ftha-kontrol&count_bg=%233b82f6&title_bg=%231f2937&icon=&icon_color=%23E7E7E7&title=Ziyaret%C3%A7i&edge_flat=false" alt="Ziyaretçi Sayacı" title="Tekil ve Toplam Ziyaretçi Sayısı" />
+        <img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fcbstkgm.github.io%2Ftha-kontrol&label=Ziyaretci&countColor=%233b82f6" alt="Ziyaretçi Sayacı" title="Ziyaretçi Sayısı" />
       </footer>
       <SqlModal isOpen={isSqlModalOpen} onClose={() => setIsSqlModalOpen(false)} />
     </div>
