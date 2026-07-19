@@ -63,8 +63,8 @@ function App() {
     const loadDefaults = async () => {
       try {
         const [thaRes, mukerrerRes] = await Promise.all([
-          fetch(import.meta.env.BASE_URL + 'Tescil_THA.csv'),
-          fetch(import.meta.env.BASE_URL + 'MukerrerParseller.csv')
+          fetch(import.meta.env.BASE_URL + 'Tescil_THA_20Temmuz2026.csv'),
+          fetch(import.meta.env.BASE_URL + 'MukerrerParseller_20Temmuz2026.csv')
         ]);
 
         if (thaRes.ok) {
