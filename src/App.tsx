@@ -398,7 +398,10 @@ function App() {
           onClose={() => setIsMapPanelOpen(false)}
         />
       </main>
-      <footer className="app-footer">CBS Şube Müdürlüğü @2026</footer>
+      <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
+        <span>CBS Şube Müdürlüğü @2026</span>
+        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fcbstkgm.github.io%2Ftha-kontrol&count_bg=%233b82f6&title_bg=%231f2937&icon=&icon_color=%23E7E7E7&title=Ziyaret%C3%A7i&edge_flat=false" alt="Ziyaretçi Sayacı" title="Tekil ve Toplam Ziyaretçi Sayısı" />
+      </footer>
       <SqlModal isOpen={isSqlModalOpen} onClose={() => setIsSqlModalOpen(false)} />
     </div>
   );
