@@ -59,7 +59,7 @@
   background: rgba(0, 0, 0, 0.04);
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.2s;
 }
 
@@ -143,7 +143,7 @@
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn:hover {
@@ -219,16 +219,17 @@
   .header-logo h1 {
     font-size: 1.1rem;
   }
-  
+
   .header-nav {
     overflow-x: auto;
     padding-bottom: 4px;
     justify-content: flex-start;
   }
-  
+
   .header-nav::-webkit-scrollbar {
     height: 3px;
   }
+
   .header-nav::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 4px;
@@ -272,7 +273,7 @@
   .global-search-input {
     font-size: 0.85rem;
   }
-  
+
   .layers-dropdown {
     width: auto;
     flex-grow: 1;
