@@ -10,6 +10,14 @@ import { parseCSVString } from './utils/dataParsers';
 import type { ThaRecord, MukerrerRecord, ViewTab, MapBaseLayer } from './types';
 import './App.css';
 
+export const THA_CSV_FILENAME = 'Tescil_THA_24.07.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_24.07.2026.csv';
+
+const extractDateFromFilename = (filename: string) => {
+  const match = filename.match(/_([^\.]+)\.csv/);
+  return match ? match[1] : '';
+};
+
 const getWktArea = (wkt: string | undefined): string | undefined => {
   if (!wkt) return undefined;
   try {
@@ -63,8 +71,8 @@ function App() {
     const loadDefaults = async () => {
       try {
         const [thaRes, mukerrerRes] = await Promise.all([
-          fetch(import.meta.env.BASE_URL + 'Tescil_THA_20Temmuz2026.csv'),
-          fetch(import.meta.env.BASE_URL + 'MukerrerParseller_20Temmuz2026.csv')
+          fetch(import.meta.env.BASE_URL + THA_CSV_FILENAME),
+          fetch(import.meta.env.BASE_URL + MUKERRER_CSV_FILENAME)
         ]);
 
         if (thaRes.ok) {
@@ -398,8 +406,10 @@ function App() {
           onClose={() => setIsMapPanelOpen(false)}
         />
       </main>
-      <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
+      <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem', flexWrap: 'wrap' }}>
         CBS Şube Müdürlüğü @2026 
+        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
+        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary, #666)' }}>Son Güncelleme Tarihi: {extractDateFromFilename(THA_CSV_FILENAME)}</span>
         <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
         <img src="https://hits.sh/cbstkgm.github.io/tha-kontrol.svg?label=Ziyaret%C3%A7i&color=3b82f6" alt="Ziyaretçi Sayacı" />
       </footer>
