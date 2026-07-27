@@ -14,7 +14,7 @@ export const THA_CSV_FILENAME = 'Tescil_THA_24.07.2026.csv';
 export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_24.07.2026.csv';
 
 const extractDateFromFilename = (filename: string) => {
-  const match = filename.match(/_([^\.]+)\.csv/);
+  const match = filename.match(/_(.+?)\.csv/i);
   return match ? match[1] : '';
 };
 
