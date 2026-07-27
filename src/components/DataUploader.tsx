@@ -5,8 +5,8 @@ import type { ThaRecord, MukerrerRecord } from '../types';
 import './DataUploader.css';
 
 interface DataUploaderProps {
-  onThaUpload: (data: ThaRecord[]) => void;
-  onMukerrerUpload: (data: MukerrerRecord[]) => void;
+  onThaUpload: (data: ThaRecord[], filename?: string) => void;
+  onMukerrerUpload: (data: MukerrerRecord[], filename?: string) => void;
 }
 
 const DataUploader: React.FC<DataUploaderProps> = ({ onThaUpload, onMukerrerUpload }) => {
@@ -25,11 +25,11 @@ const DataUploader: React.FC<DataUploaderProps> = ({ onThaUpload, onMukerrerUplo
         const data = await parseFile<ThaRecord>(file);
         // Add internally generated ID to ensure unique keys in react lists
         const dataWithIds = data.map((item, index) => ({...item, id: `tha-${index}`}));
-        onThaUpload(dataWithIds);
+        onThaUpload(dataWithIds, file.name);
       } else {
         const data = await parseFile<MukerrerRecord>(file);
         const dataWithIds = data.map((item, index) => ({...item, id: `muk-${index}`}));
-        onMukerrerUpload(dataWithIds);
+        onMukerrerUpload(dataWithIds, file.name);
       }
     } catch (err: any) {
       setError(err.message || 'Dosya yüklenirken bir hata oluştu.');

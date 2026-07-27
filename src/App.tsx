@@ -45,6 +45,7 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 };
 
 function App() {
+  const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(THA_CSV_FILENAME));
   const [activeTab, setActiveTab] = useState<ViewTab>('mukerrer');
   const [baseLayer, setBaseLayer] = useState<MapBaseLayer>('google_satellite');
 
@@ -370,8 +371,8 @@ function App() {
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data) => { setThaData(data); setActiveTab('tha'); }}
-              onMukerrerUpload={(data) => { setMukerrerData(data); setActiveTab('mukerrer'); }}
+              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if(filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if(filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
             />
           )}
 
@@ -409,7 +410,7 @@ function App() {
       <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem', flexWrap: 'wrap' }}>
         CBS Şube Müdürlüğü @2026 
         <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
-        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary, #666)' }}>Son Güncelleme Tarihi: {extractDateFromFilename(THA_CSV_FILENAME)}</span>
+        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary, #666)' }}>Son Güncelleme Tarihi: {lastUpdateDate || extractDateFromFilename(THA_CSV_FILENAME)}</span>
         <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
         <img src="https://hits.sh/cbstkgm.github.io/tha-kontrol.svg?label=Ziyaret%C3%A7i&color=3b82f6" alt="Ziyaretçi Sayacı" />
       </footer>
