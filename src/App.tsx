@@ -11,7 +11,7 @@ import type { ThaRecord, MukerrerRecord, ViewTab, MapBaseLayer } from './types';
 import './App.css';
 
 export const THA_CSV_FILENAME = 'Tescil_THA_03.08.2026.csv';
-export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_03.08.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_04.08.2026.csv';
 
 const extractDateFromFilename = (filename: string) => {
   const match = filename.match(/_(.+?)\.csv/i);
@@ -371,8 +371,8 @@ function App() {
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if(filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
-              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if(filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
             />
           )}
 
@@ -408,10 +408,10 @@ function App() {
         />
       </main>
       <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem', flexWrap: 'wrap' }}>
-        CBS Şube Müdürlüğü @2026 
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
+        CBS Şube Müdürlüğü @2026
+        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
         <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary, #666)' }}>Son Güncelleme Tarihi: {lastUpdateDate || extractDateFromFilename(THA_CSV_FILENAME)}</span>
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span> 
+        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
         <img src="https://hits.sh/cbstkgm.github.io/tha-kontrol.svg?label=Ziyaret%C3%A7i&color=3b82f6" alt="Ziyaretçi Sayacı" />
       </footer>
       <SqlModal isOpen={isSqlModalOpen} onClose={() => setIsSqlModalOpen(false)} />
