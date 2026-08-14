@@ -10,8 +10,8 @@ import { parseCSVString } from './utils/dataParsers';
 import type { ThaRecord, MukerrerRecord, ViewTab, MapBaseLayer } from './types';
 import './App.css';
 
-export const THA_CSV_FILENAME = 'Tescil_THA_03.08.2026.csv';
-export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_04.08.2026.csv';
+export const THA_CSV_FILENAME = 'Tescil_THA_13.08.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
 
 const extractDateFromFilename = (filename: string) => {
   const match = filename.match(/_(.+?)\.csv/i);
