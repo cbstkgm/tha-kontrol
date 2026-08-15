@@ -61,7 +61,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [showMobileDateTooltip, setShowMobileDateTooltip] = useState(false);
   const [showVisitorTooltip, setShowVisitorTooltip] = useState(false);
-  const [visitorCount] = useState(() => (1200 + Math.floor(Math.random() * 300)).toLocaleString('tr-TR'));
+  const [visitorCount] = useState("0");
 
   useEffect(() => {
     const dataLen = totalDataLength !== undefined ? totalDataLength : data.length;
