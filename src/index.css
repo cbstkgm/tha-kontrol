@@ -1,18 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-color: #f5f5f5;
-  --panel-bg: rgba(255, 255, 255, 0.9);
-  --panel-border: rgba(163, 163, 163, 0.3);
-  --text-primary: #111111;
-  --text-secondary: #5e5e5e;
-  --primary-color: #c4a484;
-  --primary-hover: #a68a6b;
-  --success-color: #7b8a7b;
-  --danger-color: #8c5a5a;
-  --border-color: #d4d4d4;
-  --glass-shadow: 0 8px 32px 0 rgba(17, 17, 17, 0.05);
-  --glass-blur: blur(12px);
+  --panel-bg: rgba(255, 255, 255, 0.6);
+  --panel-border: rgba(255, 255, 255, 0.6);
+  --panel-border-light: rgba(255, 255, 255, 0.9);
+  --text-primary: #1e293b;
+  --text-secondary: #334155;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --border-color: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --glass-shadow-hover: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+  --glass-blur: blur(24px);
   --header-height: 70px;
 }
 
@@ -24,9 +25,16 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  background-image: radial-gradient(circle at top right, #e5d9c5, transparent 40%),
-                    radial-gradient(circle at bottom left, #dcdcdc, transparent 40%);
+  background-color: #e2e8f0;
+  background-image: 
+    radial-gradient(at 40% 20%, hsla(210,100%,90%,1) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189,100%,86%,1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(210,100%,92%,1) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(280,100%,92%,1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(220,100%,88%,1) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, hsla(240,100%,90%,1) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(220,100%,95%,1) 0px, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   min-height: 100dvh;
@@ -39,8 +47,14 @@ body {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--panel-border);
+  border-top: 1px solid var(--panel-border-light);
+  border-left: 1px solid var(--panel-border-light);
   box-shadow: var(--glass-shadow);
-  border-radius: 12px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+.glass-panel:hover {
+  box-shadow: var(--glass-shadow-hover);
 }
 
 /* Custom Scrollbar */

@@ -47,13 +47,12 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 function App() {
   const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(THA_CSV_FILENAME));
   const [activeTab, setActiveTab] = useState<ViewTab>('mukerrer');
-  const [baseLayer, setBaseLayer] = useState<MapBaseLayer>('google_satellite');
+  const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
   const [thaData, setThaData] = useState<ThaRecord[]>([]);
   const [mukerrerData, setMukerrerData] = useState<MukerrerRecord[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAllGeometries, setShowAllGeometries] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -97,90 +96,46 @@ function App() {
     loadDefaults();
   }, []);
 
+  const normalizeSearch = (s: string) => s.toLocaleLowerCase('tr-TR').replace(/\s*([/-])\s*/g, '$1');
+
   const filteredThaData = useMemo(() => {
     if (!searchQuery) return thaData;
-    const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
-    return thaData.filter(row =>
-      Object.entries(row).some(([key, val]) => {
+    const normalizedQuery = normalizeSearch(searchQuery);
+    return thaData.filter(row => {
+      const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
+      if (locString.includes(normalizedQuery)) return true;
+
+      return Object.entries(row).some(([key, val]) => {
         const k = key.toLowerCase();
-        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery);
-      })
-    );
+        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
+      });
+    });
   }, [thaData, searchQuery]);
 
   const filteredMukerrerData = useMemo(() => {
     if (!searchQuery) return mukerrerData;
-    const lowerQuery = searchQuery.toLocaleLowerCase('tr-TR');
-    return mukerrerData.filter(row =>
-      Object.entries(row).some(([key, val]) => {
+    const normalizedQuery = normalizeSearch(searchQuery);
+    return mukerrerData.filter(row => {
+      const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
+      if (locString.includes(normalizedQuery)) return true;
+
+      return Object.entries(row).some(([key, val]) => {
         const k = key.toLowerCase();
-        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && String(val).toLocaleLowerCase('tr-TR').includes(lowerQuery);
-      })
-    );
+        return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
+      });
+    });
   }, [mukerrerData, searchQuery]);
 
-  const allFeatures = useMemo(() => {
-    let features: MapFeature[] = [];
-    thaData.forEach(row => {
-      if (row.geom) features.push({ wkt: row.geom, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${row.adano}/${row.parselno}`, areaText: getWktArea(row.geom), centroid: getWktCentroid(row.geom) });
-    });
 
-    mukerrerData.forEach(row => {
-      let mukerrerWkt = row.mukerrer_parsel_geom;
-      let thaWkt = row.tha_geom;
-
-      if (mukerrerWkt) {
-        features.push({ wkt: mukerrerWkt, color: '#9333ea', label: 'Mükerrer Parsel', adaParsel: `${row.mukerrer_adano}/${row.mukerrer_parselno}`, areaText: getWktArea(mukerrerWkt), centroid: getWktCentroid(mukerrerWkt) });
-      }
-      if (thaWkt) {
-        features.push({ wkt: thaWkt, color: '#ea580c', label: 'THA (Mükerrer Tablo)', adaParsel: `${row.tha_ihdas_adano}/${row.tha_ihdas_parselno}`, areaText: getWktArea(thaWkt), centroid: getWktCentroid(thaWkt) });
-      } else {
-        const match = thaData.find(t => t.adano == row.tha_ihdas_adano && t.parselno == row.tha_ihdas_parselno);
-        if (match && match.geom) {
-          thaWkt = match.geom;
-        }
-      }
-
-      // Compute Intersection
-      if (mukerrerWkt && thaWkt) {
-        try {
-          const geo1 = parse(mukerrerWkt);
-          const geo2 = parse(thaWkt);
-          if (geo1 && geo2) {
-            const poly1 = turf.feature(geo1 as any);
-            const poly2 = turf.feature(geo2 as any);
-            const intersection = turf.intersect(turf.featureCollection([poly1, poly2]));
-            if (intersection) {
-              const displayArea = row.kesisen_alan_m2 != null && String(row.kesisen_alan_m2).trim() !== ''
-                ? `${Number(row.kesisen_alan_m2).toLocaleString('tr-TR')} m²`
-                : `${Math.round(turf.area(intersection)).toLocaleString('tr-TR')} m²`;
-              const center = turf.centroid(intersection);
-              features.push({
-                geoJson: intersection.geometry,
-                color: '#3b82f6',
-                isHatched: true,
-                areaText: displayArea,
-                centroid: [center.geometry.coordinates[1], center.geometry.coordinates[0]] as [number, number]
-              });
-            }
-          }
-        } catch (e) {
-          console.error("Intersection failed", e);
-        }
-      }
-    });
-    return features;
-  }, [thaData, mukerrerData]);
 
   const handleRowCheck = (row: any, checked: boolean) => {
     const rowKey = String(row.id);
-    const newChecked = new Set(checkedRowIds);
+    const newChecked = new Set<string>();
     if (checked) {
       newChecked.add(rowKey);
       setIsMapPanelOpen(true);
     } else {
-      newChecked.delete(rowKey);
-      if (newChecked.size === 0) setIsMapPanelOpen(false);
+      setIsMapPanelOpen(false);
     }
     setCheckedRowIds(newChecked);
   };
@@ -316,32 +271,7 @@ function App() {
           }
         }
 
-        // Mükerrer parselle kesişen diğer THA parsellerini bul
-        if (mukerrerWkt) {
-          try {
-            const mGeo = parse(mukerrerWkt);
-            if (mGeo) {
-              const mPoly = turf.feature(mGeo as any);
-              thaData.forEach(t => {
-                if (String(t.adano).trim() === String(row.tha_ihdas_adano).trim() && String(t.parselno).trim() === String(row.tha_ihdas_parselno).trim()) {
-                  return;
-                }
-                if (t.geom) {
-                  const tGeo = parse(t.geom);
-                  if (tGeo) {
-                    const tPoly = turf.feature(tGeo as any);
-                    const isIntersecting = turf.intersect(turf.featureCollection([mPoly, tPoly]));
-                    if (isIntersecting) {
-                      features.push({ wkt: t.geom, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${t.adano}/${t.parselno}`, areaText: getWktArea(t.geom), centroid: getWktCentroid(t.geom) });
-                    }
-                  }
-                }
-              });
-            }
-          } catch (e) {
-            console.error("Diger THA kesişimleri bulunurken hata", e);
-          }
-        }
+
       }
     });
 
@@ -360,11 +290,11 @@ function App() {
       <Header
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        baseLayer={baseLayer}
-        setBaseLayer={setBaseLayer}
         searchQuery={searchInput}
         setSearchQuery={setSearchInput}
         onOpenSqlModal={() => setIsSqlModalOpen(true)}
+        mobileViewMode={mobileViewMode}
+        setMobileViewMode={setMobileViewMode}
       />
 
       <main className="main-content">
@@ -380,9 +310,11 @@ function App() {
             <DataTable
               type="tha"
               data={filteredThaData}
+              totalDataLength={thaData.length}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               onRowsCheck={handleRowsCheck}
+              mobileViewMode={mobileViewMode}
             />
           )}
 
@@ -390,30 +322,26 @@ function App() {
             <DataTable
               type="mukerrer"
               data={filteredMukerrerData}
+              totalDataLength={mukerrerData.length}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               onRowsCheck={handleRowsCheck}
+              mobileViewMode={mobileViewMode}
             />
           )}
         </div>
 
         <RightPanelMap
           isOpen={isMapPanelOpen}
-          features={showAllGeometries ? allFeatures : mapFeatures}
+          features={mapFeatures}
           focusFeatures={mapFeatures}
-          baseLayer={baseLayer}
-          showAllGeometries={showAllGeometries}
-          setShowAllGeometries={setShowAllGeometries}
-          onClose={() => setIsMapPanelOpen(false)}
+          onClose={() => {
+            setIsMapPanelOpen(false);
+            setCheckedRowIds(new Set());
+          }}
         />
       </main>
-      <footer className="app-footer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '1rem', flexWrap: 'wrap' }}>
-        CBS Şube Müdürlüğü @2026
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
-        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary, #666)' }}>Son Güncelleme Tarihi: {lastUpdateDate || extractDateFromFilename(THA_CSV_FILENAME)}</span>
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
-        <img src="https://hits.sh/cbstkgm.github.io/tha-kontrol.svg?label=Ziyaret%C3%A7i&color=3b82f6" alt="Ziyaretçi Sayacı" />
-      </footer>
+
       <SqlModal isOpen={isSqlModalOpen} onClose={() => setIsSqlModalOpen(false)} />
     </div>
   );

@@ -1,9 +1,10 @@
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; /* Fallback */
   height: 100dvh;
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .main-content {
@@ -12,13 +13,17 @@
   overflow: hidden;
   position: relative;
   width: 100%;
+  min-height: 0; /* Prevent flex blowout */
 }
 
 .content-area {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden; /* Changed from auto to hidden to constrain children */
   padding: 24px;
   transition: flex 0.3s ease-in-out;
+  min-height: 0;
 }
 
 .app-footer {

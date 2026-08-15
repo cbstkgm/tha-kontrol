@@ -1,39 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ViewTab, MapBaseLayer } from '../types';
-import { Layers, Database, ChevronDown, Search, Code } from 'lucide-react';
+import { Layers, Database, ChevronDown, Search, Code, Download, Menu, X, List, LayoutGrid } from 'lucide-react';
 import AnimatedLogo from './AnimatedLogo';
 import './Header.css';
 
 interface HeaderProps {
   activeTab: ViewTab;
   setActiveTab: (tab: ViewTab) => void;
-  baseLayer: MapBaseLayer;
-  setBaseLayer: (layer: MapBaseLayer) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onOpenSqlModal?: () => void;
+  mobileViewMode?: 'card' | 'table';
+  setMobileViewMode?: (mode: 'card' | 'table') => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, baseLayer, setBaseLayer, searchQuery, setSearchQuery, onOpenSqlModal }) => {
-  const [isLayersMenuOpen, setIsLayersMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, setSearchQuery, onOpenSqlModal, mobileViewMode, setMobileViewMode }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsLayersMenuOpen(false);
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
-  const layers: { id: MapBaseLayer; name: string }[] = [
-    { id: 'osm', name: 'OpenStreetMap' },
-    { id: 'google_satellite', name: 'Google Uydu' },
-    { id: 'google_hybrid', name: 'Google Hybrid' },
-    { id: 'yandex', name: 'Yandex Harita' },
-  ];
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.addEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="app-header glass-panel">
@@ -77,6 +73,49 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, baseLayer, set
       </nav>
 
       <div className="header-actions">
+        <div className="mobile-menu-container" ref={mobileMenuRef}>
+          <button 
+            className="mobile-menu-btn" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          
+          {isMobileMenuOpen && (
+            <div className="mobile-dropdown-menu">
+              <button
+                className={`mobile-dropdown-item ${activeTab === 'mukerrer' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('mukerrer'); setIsMobileMenuOpen(false); }}
+              >
+                <Database size={16} />
+                Mükerrer Parseller
+              </button>
+              <button
+                className={`mobile-dropdown-item ${activeTab === 'tha' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('tha'); setIsMobileMenuOpen(false); }}
+              >
+                <Database size={16} />
+                Tescil Edilen THA'lar
+              </button>
+              <button
+                className="mobile-dropdown-item"
+                onClick={() => { if (onOpenSqlModal) onOpenSqlModal(); setIsMobileMenuOpen(false); }}
+              >
+                <Code size={16} />
+                SQL Sorguları
+              </button>
+              <div className="mobile-dropdown-divider"></div>
+              <button 
+                className="mobile-dropdown-item text-green" 
+                onClick={() => { window.dispatchEvent(new Event('export-excel')); setIsMobileMenuOpen(false); }}
+              >
+                <Download size={16} />
+                Excel İndir
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="search-container">
           <Search size={18} className="search-icon" />
           <input
@@ -87,35 +126,16 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, baseLayer, set
             className="global-search-input"
           />
         </div>
-
-        <div className="layers-dropdown" ref={menuRef}>
-          <button
-            className="action-btn"
-            onClick={() => setIsLayersMenuOpen(!isLayersMenuOpen)}
+        
+        {setMobileViewMode && (
+          <button 
+            className="mobile-view-toggle-btn" 
+            onClick={() => setMobileViewMode(mobileViewMode === 'card' ? 'table' : 'card')}
+            title="Görünümü Değiştir"
           >
-            <Layers size={18} />
-            Katmanlar
-            <ChevronDown size={14} className={`chevron ${isLayersMenuOpen ? 'open' : ''}`} />
+            {mobileViewMode === 'card' ? <List size={22} /> : <LayoutGrid size={22} />}
           </button>
-
-          {isLayersMenuOpen && (
-            <div className="dropdown-menu glass-panel">
-              <div className="dropdown-title">Harita Altlıkları</div>
-              {layers.map(layer => (
-                <div
-                  key={layer.id}
-                  className={`dropdown-item ${baseLayer === layer.id ? 'selected' : ''}`}
-                  onClick={() => {
-                    setBaseLayer(layer.id);
-                    setIsLayersMenuOpen(false);
-                  }}
-                >
-                  {layer.name}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </header>
   );

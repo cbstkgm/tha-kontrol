@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Tooltip, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
-import { X } from 'lucide-react';
+import { X, Layers } from 'lucide-react';
 import type { MapBaseLayer } from '../types';
 import { parse } from 'wellknown';
 import 'leaflet/dist/leaflet.css';
@@ -34,9 +34,6 @@ interface RightPanelMapProps {
   onClose: () => void;
   features: MapFeature[];
   focusFeatures?: MapFeature[];
-  baseLayer: MapBaseLayer;
-  showAllGeometries: boolean;
-  setShowAllGeometries: (show: boolean) => void;
 }
 
 const ZoomTracker = ({ onZoomChange }: { onZoomChange: (z: number) => void }) => {
@@ -47,6 +44,15 @@ const ZoomTracker = ({ onZoomChange }: { onZoomChange: (z: number) => void }) =>
   useEffect(() => {
     onZoomChange(map.getZoom());
   }, [map, onZoomChange]);
+  return null;
+};
+
+const BaseLayerTracker = ({ onBaseLayerChange }: { onBaseLayerChange: (name: string) => void }) => {
+  useMapEvents({
+    baselayerchange: (e: any) => {
+      onBaseLayerChange(e.name);
+    }
+  });
   return null;
 };
 
@@ -77,12 +83,13 @@ const MapController = ({ focusFeatures }: { focusFeatures?: { geoJson: any }[] }
   return null;
 };
 
-const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, baseLayer, onClose, showAllGeometries, setShowAllGeometries }) => {
+const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, onClose }) => {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [panelWidth, setPanelWidth] = useState(40);
   const [parsedFeatures, setParsedFeatures] = useState<{geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number]}[]>([]);
   const [parsedFocusFeatures, setParsedFocusFeatures] = useState<{geoJson: any}[]>([]);
   const [currentZoom, setCurrentZoom] = useState<number>(6);
+  const [activeBaseLayer, setActiveBaseLayer] = useState<string>('Google Uydu');
+  const [showLayers, setShowLayers] = useState<boolean>(true);
 
   const handleZoomChange = React.useCallback((z: number) => {
     setCurrentZoom(z);
@@ -126,55 +133,17 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     }
   }, [isOpen, focusFeatures]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isOpen && panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        const target = event.target as Element;
-        if (target.closest('.app-header')) return;
-        if (target.closest('.map-icon-btn')) return;
-        if (target.closest('.resizer')) return; // Ignore resizer clicks
-        onClose();
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  // Dışarı tıklayınca kapanma iptal edildi, sadece kapatma butonu ile kapanacak.
 
-  const startResizing = React.useCallback((mouseDownEvent: React.MouseEvent) => {
-    mouseDownEvent.preventDefault();
-    const startWidth = panelRef.current ? panelRef.current.getBoundingClientRect().width : 0;
-    const startX = mouseDownEvent.clientX;
-
-    const doDrag = (dragEvent: MouseEvent) => {
-      const diffX = startX - dragEvent.clientX;
-      const newWidthPx = startWidth + diffX;
-      const windowWidth = window.innerWidth;
-      const newWidthPercent = (newWidthPx / windowWidth) * 100;
-      setPanelWidth(Math.min(Math.max(20, newWidthPercent), 90));
-    };
-
-    const stopDrag = () => {
-      document.removeEventListener('mousemove', doDrag);
-      document.removeEventListener('mouseup', stopDrag);
-    };
-
-    document.addEventListener('mousemove', doDrag);
-    document.addEventListener('mouseup', stopDrag);
-  }, []);
-
-  const tileUrls: Record<MapBaseLayer, string> = {
-    osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    google_satellite: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}',
-    google_hybrid: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}',
-    yandex: 'https://core-sat.maps.yandex.net/tiles?l=sat&v=3.1023.0&x={x}&y={y}&z={z}&scale=1&lang=tr_TR'
-  };
-
-  const attributions: Record<MapBaseLayer, string> = {
-    osm: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    google_satellite: 'Map data &copy; Google',
-    google_hybrid: 'Map data &copy; Google',
-    yandex: 'Map data &copy; Yandex'
-  };
+  const baseLayersData = [
+    { name: 'Açık Tema (Mevcut)', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap' },
+    { name: 'Google Harita', url: 'http://mt0.google.com/vt/lyrs=m&hl=tr&x={x}&y={y}&z={z}', attribution: '&copy; Google' },
+    { name: 'Google Uydu', url: 'http://mt0.google.com/vt/lyrs=s&hl=tr&x={x}&y={y}&z={z}', attribution: '&copy; Google' },
+    { name: 'Google Hibrit (Uydu+Yol)', url: 'http://mt0.google.com/vt/lyrs=y&hl=tr&x={x}&y={y}&z={z}', attribution: '&copy; Google' },
+    { name: 'Google Arazi (Fiziki)', url: 'http://mt0.google.com/vt/lyrs=p&hl=tr&x={x}&y={y}&z={z}', attribution: '&copy; Google' },
+    { name: 'Esri Uydu (Orman Detay)', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '&copy; Esri' },
+    { name: 'Topografya (TopoMap)', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenTopoMap' }
+  ];
 
   const renderFeature = (f: any, idx: number) => {
     const scale = currentZoom >= 18 ? 1 : Math.pow(2, currentZoom - 18);
@@ -281,29 +250,17 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     <div 
       ref={panelRef} 
       className={`right-panel-map ${isOpen ? 'open' : ''}`}
-      style={{ width: isOpen ? `${panelWidth}%` : '40%' }}
     >
-      <div className="resizer" onMouseDown={startResizing} />
-      
       <div className="panel-header">
         <h3>Harita Görünümü</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', cursor: 'pointer', background: 'rgba(0,0,0,0.05)', padding: '4px 10px', borderRadius: '6px' }}>
-            <input
-              type="checkbox"
-              checked={showAllGeometries}
-              onChange={(e) => setShowAllGeometries(e.target.checked)}
-              style={{ accentColor: 'var(--primary-color)', width: '16px', height: '16px', cursor: 'pointer' }}
-            />
-            Tüm Geom
-          </label>
           <button className="close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
       </div>
       
-      <div className="map-container">
+      <div className={`map-container ${showLayers ? 'layers-open' : 'layers-closed'}`}>
         {isOpen && (
           <MapContainer 
             center={[39.92077, 32.85411]} 
@@ -313,13 +270,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             zoomSnap={0.5}
             style={{ height: '100%', width: '100%' }}
           >
-            <TileLayer
-              key={baseLayer}
-              url={tileUrls[baseLayer]}
-              attribution={attributions[baseLayer]}
-              maxNativeZoom={18}
-              maxZoom={22}
-            />
+            <BaseLayerTracker onBaseLayerChange={setActiveBaseLayer} />
             <svg style={{ width: 0, height: 0, position: 'absolute' }}>
               <defs>
                 <pattern id="hatchPattern" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
@@ -334,6 +285,11 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             </div>
 
             <LayersControl position="topright" collapsed={false}>
+              {baseLayersData.map((layer) => (
+                <LayersControl.BaseLayer key={layer.name} checked={activeBaseLayer === layer.name} name={layer.name}>
+                  <TileLayer url={layer.url} attribution={layer.attribution} maxNativeZoom={18} maxZoom={22} />
+                </LayersControl.BaseLayer>
+              ))}
               {tescilliFeatures.length > 0 && (
                 <LayersControl.Overlay checked name="<span class='layer-lbl' data-color='#16a34a' style='color: #16a34a; font-weight: 600;'>Tescilli THA</span>">
                   <LayerGroup>
@@ -365,6 +321,13 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             </LayersControl>
           </MapContainer>
         )}
+        <button 
+          className="mobile-layers-toggle-btn"
+          onClick={() => setShowLayers(!showLayers)}
+          title="Katmanları Göster/Gizle"
+        >
+          <Layers size={22} />
+        </button>
       </div>
     </div>
   );
