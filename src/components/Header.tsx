@@ -112,6 +112,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
                 <Download size={16} />
                 Excel İndir
               </button>
+              <button 
+                className="mobile-dropdown-item text-green" 
+                onClick={() => { window.dispatchEvent(new Event('export-csv')); setIsMobileMenuOpen(false); }}
+              >
+                <Download size={16} />
+                CSV İndir
+              </button>
             </div>
           )}
         </div>

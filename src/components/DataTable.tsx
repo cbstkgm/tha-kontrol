@@ -217,10 +217,52 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     XLSX.writeFile(workbook, fileName);
   }, [data, type]);
 
+  const handleExportCSV = useCallback(() => {
+    const cols = type === 'tha' ? thaColumns : mukerrerColumns;
+    const exportData = data.map(row => {
+      const newRow: any = {};
+      cols.forEach(col => {
+        let val = row[col.key];
+        if ((col.key === 'tesciltarih' || col.key === 'tapu_tesciltarih') && (val === undefined || val === null || val === '')) {
+          val = row['tesciltarih'] ?? row['tapu_tesciltarih'] ?? row['taputesciltarih'] ?? val;
+        }
+        if ((col.key === 'tescilyevmiyeno' || col.key === 'tapu_tescilyevmiyeno') && (val === undefined || val === null || val === '')) {
+          val = row['tescilyevmiyeno'] ?? row['tapu_tescilyevmiyeno'] ?? row['taputescilyevmiyeno'] ?? row['yevmiyeno'] ?? val;
+        }
+
+        if (type === 'tha' && ['tesciltarih', 'tapu_tesciltarih', 'tescilyevmiyeno', 'tapu_tescilyevmiyeno'].includes(col.key)) {
+          const status = (row['basvuru_asama_durum'] || '').toString().toLowerCase().trim();
+          const allowed = ['onaylandı', 'onaylandi', 'tescilden geldi', 'onay bekliyor', 'tamamlandı', 'tamamlandi'];
+          if (!allowed.includes(status)) {
+            val = '';
+          }
+        }
+        newRow[col.label] = val;
+      });
+      return newRow;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    const fileName = type === 'tha' ? 'tescil_edilen_thalar.csv' : 'mukerrer_parseller.csv';
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [data, type]);
+
   useEffect(() => {
     window.addEventListener('export-excel', handleExportExcel);
-    return () => window.removeEventListener('export-excel', handleExportExcel);
-  }, [handleExportExcel]);
+    window.addEventListener('export-csv', handleExportCSV);
+    return () => {
+      window.removeEventListener('export-excel', handleExportExcel);
+      window.removeEventListener('export-csv', handleExportCSV);
+    };
+  }, [handleExportExcel, handleExportCSV]);
 
   const columns = type === 'tha' ? thaColumns : mukerrerColumns;
 
@@ -260,10 +302,16 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         </div>
 
         <div className="table-header-actions">
-          <button className="export-excel-btn" onClick={handleExportExcel} title="Excel Olarak İndir">
-            <Download size={16} />
-            <span className="export-text">Excel İndir</span>
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="export-excel-btn" onClick={handleExportExcel} title="Excel Olarak İndir">
+              <Download size={16} />
+              <span className="export-text">Excel İndir</span>
+            </button>
+            <button className="export-excel-btn" onClick={handleExportCSV} title="CSV Olarak İndir" style={{ background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}>
+              <Download size={16} />
+              <span className="export-text">CSV İndir</span>
+            </button>
+          </div>
 
           <div className="page-size-selector">
             <label>Kayıt Sayısı: </label>
