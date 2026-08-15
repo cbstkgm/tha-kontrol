@@ -267,11 +267,10 @@
     top: calc(100% + 8px);
     left: 0;
     width: 220px;
-    background: var(--panel-bg);
-    backdrop-filter: var(--glass-blur);
+    background: #ffffff;
     border-radius: 12px;
     border: 1px solid var(--border-color);
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     padding: 8px;
     display: flex;
     flex-direction: column;
