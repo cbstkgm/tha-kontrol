@@ -506,10 +506,9 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
             <span style={{ display: isMobile ? 'none' : 'inline' }}>Güncelleme: {lastUpdateDate}</span>
 
             {showMobileDateTooltip && isMobile && (
-              <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px', padding: '6px 12px', background: 'var(--bg-panel)', border: '1px solid var(--border-color)', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', whiteSpace: 'nowrap', zIndex: 100, color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+              <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px', padding: '6px 12px', background: '#1e293b', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', zIndex: 1000, color: '#f8fafc', fontSize: '0.85rem', fontWeight: 500 }}>
                 Güncelleme: {lastUpdateDate}
-                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: '6px', borderStyle: 'solid', borderColor: 'var(--border-color) transparent transparent transparent' }} />
-                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '-1px', borderWidth: '6px', borderStyle: 'solid', borderColor: 'var(--bg-panel) transparent transparent transparent' }} />
+                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid #1e293b' }} />
               </div>
             )}
           </div>
