@@ -105,11 +105,11 @@
 
 .panel-header {
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--primary-color);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
 }
@@ -117,24 +117,26 @@
 .panel-header h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: white;
   margin: 0;
 }
 
 .close-btn {
-  background: transparent;
-  color: var(--text-secondary);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger-color);
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  transition: all 0.2s;
 }
 
 .close-btn:hover {
-  background: rgba(0,0,0,0.05);
-  color: var(--text-primary);
+  background: var(--danger-color);
+  color: white;
 }
 
 .map-container {
@@ -206,28 +208,6 @@
 }
 
 @media (max-width: 768px) {
-  .right-panel-map .panel-header {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .right-panel-map .panel-header h3 {
-    color: white;
-  }
-  
-  .right-panel-map .panel-header .close-btn {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-  }
-  
-  .right-panel-map .panel-header .close-btn:hover, .right-panel-map .panel-header .close-btn:active {
-    background: #ef4444;
-    color: white;
-  }
-
   .mobile-layers-toggle-btn {
     display: flex;
     position: absolute;
