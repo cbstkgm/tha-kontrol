@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Tooltip, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
 import { X, Layers } from 'lucide-react';
-import type { MapBaseLayer } from '../types';
+
 import { parse } from 'wellknown';
 import 'leaflet/dist/leaflet.css';
 import './RightPanelMap.css';

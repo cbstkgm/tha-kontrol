@@ -7,16 +7,13 @@ import SqlModal from './components/SqlModal';
 import * as turf from '@turf/turf';
 import { parse } from 'wellknown';
 import { parseCSVString } from './utils/dataParsers';
-import type { ThaRecord, MukerrerRecord, ViewTab, MapBaseLayer } from './types';
+import type { ThaRecord, MukerrerRecord, ViewTab } from './types';
 import './App.css';
 
 export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
 export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
 
-const extractDateFromFilename = (filename: string) => {
-  const match = filename.match(/_(.+?)\.csv/i);
-  return match ? match[1] : '';
-};
+
 
 const getWktArea = (wkt: string | undefined): string | undefined => {
   if (!wkt) return undefined;
@@ -45,7 +42,7 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 };
 
 function App() {
-  const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(THA_CSV_FILENAME));
+
   const [activeTab, setActiveTab] = useState<ViewTab>('mukerrer');
   const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
@@ -140,18 +137,7 @@ function App() {
     setCheckedRowIds(newChecked);
   };
 
-  const handleRowsCheck = (rows: any[], checked: boolean) => {
-    const newChecked = new Set(checkedRowIds);
-    rows.forEach(row => {
-      const rowKey = String(row.id);
-      if (checked) newChecked.add(rowKey);
-      else newChecked.delete(rowKey);
-    });
 
-    if (newChecked.size > 0) setIsMapPanelOpen(true);
-    else setIsMapPanelOpen(false);
-    setCheckedRowIds(newChecked);
-  };
 
   useEffect(() => {
     if (checkedRowIds.size === 0) {
@@ -301,8 +287,8 @@ function App() {
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
-              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onThaUpload={(data) => { setThaData(data); setActiveTab('tha'); }}
+              onMukerrerUpload={(data) => { setMukerrerData(data); setActiveTab('mukerrer'); }}
             />
           )}
 
@@ -313,7 +299,6 @@ function App() {
               totalDataLength={thaData.length}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
-              onRowsCheck={handleRowsCheck}
               mobileViewMode={mobileViewMode}
             />
           )}
@@ -325,7 +310,6 @@ function App() {
               totalDataLength={mukerrerData.length}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
-              onRowsCheck={handleRowsCheck}
               mobileViewMode={mobileViewMode}
             />
           )}

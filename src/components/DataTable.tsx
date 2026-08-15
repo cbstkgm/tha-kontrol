@@ -9,7 +9,7 @@ interface DataTableProps {
   data: any[];
   checkedRowIds: Set<string>;
   onRowCheck: (row: any, checked: boolean) => void;
-  onRowsCheck?: (rows: any[], checked: boolean) => void;
+
   mobileViewMode?: 'card' | 'table';
   totalDataLength?: number;
 }
@@ -53,7 +53,7 @@ const thaColumns = [
   { key: 'tapu_tescilyevmiyeno', label: 'Tescil Yevmiye No' }
 ];
 
-const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowCheck, onRowsCheck, mobileViewMode = 'card', totalDataLength }) => {
+const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowCheck, mobileViewMode = 'card', totalDataLength }) => {
   const [pageSize, setPageSize] = useState<number>(20);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -78,7 +78,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
       return () => clearInterval(interval);
     }
   }, [totalDataLength, data.length, isReadyToRender]);
-  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
@@ -161,7 +161,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     setSortConfig({ key, direction });
   };
 
-  const handleRowClick = (e: React.MouseEvent, row: any, idx: number) => {
+  const handleRowClick = (row: any, idx: number) => {
     const geomStr = row.mukerrer_parsel_geom || row.tha_geom || row.geom;
     if (!geomStr) return;
 
@@ -170,7 +170,6 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     const isChecked = checkedRowIds.has(rowKey);
 
     onRowCheck(row, !isChecked);
-    setLastSelectedIndex(globalIdx);
   };
 
   const goToPage = (page: number) => {
@@ -288,7 +287,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
 
               if (type === 'mukerrer') {
                 return (
-                  <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={(e) => handleRowClick(e, row, idx)}>
+                  <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={() => handleRowClick(row, idx)}>
                     <div className="mc-header">
                       <span className="mc-index">#{globalIdx}</span>
                       <span className="mc-badge mc-badge-green">Mükerrer</span>
@@ -334,7 +333,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                 );
               } else {
                 return (
-                  <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={(e) => handleRowClick(e, row, idx)}>
+                  <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={() => handleRowClick(row, idx)}>
                     <div className="mc-header">
                       <span className="mc-index">#{globalIdx}</span>
                       <span className="mc-badge mc-badge-green">Tescilli THA</span>
@@ -423,7 +422,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                   <tr
                     key={rowKey}
                     className={isRowActive ? 'active-row' : ''}
-                    onClick={(e) => handleRowClick(e, row, idx)}
+                    onClick={() => handleRowClick(row, idx)}
                     style={{ cursor: 'pointer' }}
                   >
                     <td className="action-col" style={{ textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 500 }}>
