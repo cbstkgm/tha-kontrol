@@ -61,7 +61,24 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [showMobileDateTooltip, setShowMobileDateTooltip] = useState(false);
   const [showVisitorTooltip, setShowVisitorTooltip] = useState(false);
-  const [visitorCount] = useState("0");
+  const [visitorCount, setVisitorCount] = useState("...");
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem('has_visited');
+    const endpoint = hasVisited 
+      ? 'https://countapi.mileshilliard.com/api/v1/get/cbstkgm-tha-kontrol-visitor-count'
+      : 'https://countapi.mileshilliard.com/api/v1/hit/cbstkgm-tha-kontrol-visitor-count';
+      
+    fetch(endpoint)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.value !== undefined) {
+          setVisitorCount(data.value.toLocaleString('tr-TR'));
+          if (!hasVisited) sessionStorage.setItem('has_visited', 'true');
+        }
+      })
+      .catch(err => console.error('Sayaç yüklenemedi:', err));
+  }, []);
 
   useEffect(() => {
     const dataLen = totalDataLength !== undefined ? totalDataLength : data.length;
