@@ -116,9 +116,9 @@
 }
 
 .search-container:focus-within {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--panel-bg);
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.2); /* using new primary color */
   width: 300px;
 }
 
@@ -149,18 +149,19 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: white;
+  background: var(--panel-bg);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
 }
 
 .action-btn:hover {
-  background: #f5f5f5;
-  border-color: #d4d4d4;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--primary-color);
 }
 
 .chevron {
@@ -182,6 +183,10 @@
   flex-direction: column;
   gap: 4px;
   z-index: 1200;
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--glass-shadow);
 }
 
 .dropdown-title {
@@ -262,11 +267,11 @@
     top: calc(100% + 8px);
     left: 0;
     width: 220px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
+    background: var(--panel-bg);
+    backdrop-filter: var(--glass-blur);
     border-radius: 12px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--glass-shadow);
     padding: 8px;
     display: flex;
     flex-direction: column;

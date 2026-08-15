@@ -5,10 +5,11 @@
   height: 100%;
   right: 0;
   width: 100%;
-  background: white;
-  border: none;
-  border-radius: 0;
-  box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--panel-border-light);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.3);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -21,8 +22,8 @@
   position: absolute;
   bottom: 20px;
   left: 20px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px);
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 6px;
@@ -108,9 +109,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .panel-header h3 {
@@ -141,7 +142,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  background: #d4d4d4;
+  background: #0f172a;
 }
 
 .mobile-layers-toggle-btn {
@@ -156,10 +157,29 @@
 
 .leaflet-control-attribution {
   font-size: 10px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text-primary) !important;
 }
 
+.leaflet-bar a {
+  background-color: var(--panel-bg) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  backdrop-filter: var(--glass-blur) !important;
+}
 
+.leaflet-bar a:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--primary-color) !important;
+}
 
+.leaflet-control-layers {
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  border-radius: 8px !important;
+}
 /* Layer Control Checkbox Colors */
 .leaflet-control-layers-overlays label:has(.layer-lbl[data-color="#16a34a"]) input[type="checkbox"] {
   accent-color: #16a34a;
@@ -216,14 +236,14 @@
     z-index: 1000;
     width: 44px;
     height: 44px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px);
-    border: 2px solid rgba(0, 0, 0, 0.15);
+    background: var(--panel-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     align-items: center;
     justify-content: center;
-    color: #374151;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: var(--text-primary);
+    box-shadow: var(--glass-shadow);
   }
 
   .layers-closed .leaflet-control-layers {
