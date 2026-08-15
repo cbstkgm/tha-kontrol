@@ -13,6 +13,11 @@ import './App.css';
 export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
 export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
 
+export const extractDateFromFilename = (filename: string) => {
+  const match = filename.match(/_(.+?)\.csv/i);
+  return match ? match[1] : '';
+};
+
 
 
 const getWktArea = (wkt: string | undefined): string | undefined => {
@@ -42,7 +47,7 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 };
 
 function App() {
-
+  const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(MUKERRER_CSV_FILENAME));
   const [activeTab, setActiveTab] = useState<ViewTab>('mukerrer');
   const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
@@ -287,8 +292,8 @@ function App() {
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data) => { setThaData(data); setActiveTab('tha'); }}
-              onMukerrerUpload={(data) => { setMukerrerData(data); setActiveTab('mukerrer'); }}
+              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
             />
           )}
 
@@ -297,6 +302,7 @@ function App() {
               type="tha"
               data={filteredThaData}
               totalDataLength={thaData.length}
+              lastUpdateDate={lastUpdateDate}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               mobileViewMode={mobileViewMode}
@@ -308,6 +314,7 @@ function App() {
               type="mukerrer"
               data={filteredMukerrerData}
               totalDataLength={mukerrerData.length}
+              lastUpdateDate={lastUpdateDate}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               mobileViewMode={mobileViewMode}

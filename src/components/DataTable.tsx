@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Database } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Database, Info } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import './DataTable.css';
 
@@ -12,6 +12,7 @@ interface DataTableProps {
 
   mobileViewMode?: 'card' | 'table';
   totalDataLength?: number;
+  lastUpdateDate?: string;
 }
 
 const mukerrerColumns = [
@@ -53,7 +54,7 @@ const thaColumns = [
   { key: 'tapu_tescilyevmiyeno', label: 'Tescil Yevmiye No' }
 ];
 
-const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowCheck, mobileViewMode = 'card', totalDataLength }) => {
+const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowCheck, mobileViewMode = 'card', totalDataLength, lastUpdateDate }) => {
   const [pageSize, setPageSize] = useState<number>(20);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -455,7 +456,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         )}
       </div>
 
-      <div className="table-footer">
+      <div className="table-footer" style={{ position: 'relative' }}>
         <div className="pagination-info" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span>
             {isMobile 
@@ -480,8 +481,31 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
           )}
         </div>
 
+        {lastUpdateDate && (
+          <div 
+            className="update-info" 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px', 
+              color: 'var(--text-secondary)', 
+              fontSize: '0.8rem', 
+              position: isMobile ? 'static' : 'absolute', 
+              left: '50%', 
+              transform: isMobile ? 'none' : 'translateX(-50%)',
+              order: isMobile ? 2 : 0,
+              flex: isMobile ? '1' : 'none',
+              justifyContent: isMobile ? 'center' : 'flex-start'
+            }} 
+            title={`Güncelleme Tarihi: ${lastUpdateDate}`}
+          >
+            <Info size={14} style={{ color: 'var(--primary-color)' }} />
+            <span style={{ display: isMobile ? 'none' : 'inline' }}>Güncelleme: {lastUpdateDate}</span>
+          </div>
+        )}
+
         {totalPages > 1 && (
-          <div className="pagination-controls">
+          <div className="pagination-controls" style={{ order: isMobile ? 3 : 0 }}>
             <button disabled={currentPage === 1} onClick={() => goToPage(1)}><ChevronsLeft size={16} /></button>
             <button disabled={currentPage === 1} onClick={() => goToPage(currentPage - 1)}><ChevronLeft size={16} /></button>
             <span className="page-indicator">
