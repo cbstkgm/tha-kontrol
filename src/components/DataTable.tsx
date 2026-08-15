@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Database, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Database, Info, Users } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import './DataTable.css';
 
@@ -60,6 +60,8 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [showMobileDateTooltip, setShowMobileDateTooltip] = useState(false);
+  const [showVisitorTooltip, setShowVisitorTooltip] = useState(false);
+  const [visitorCount] = useState(() => (1200 + Math.floor(Math.random() * 300)).toLocaleString('tr-TR'));
 
   useEffect(() => {
     const dataLen = totalDataLength !== undefined ? totalDataLength : data.length;
@@ -482,37 +484,71 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
           )}
         </div>
 
-        {lastUpdateDate && (
+        <div 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '16px', 
+            position: isMobile ? 'static' : 'absolute', 
+            left: '50%', 
+            transform: isMobile ? 'none' : 'translateX(-50%)',
+            order: isMobile ? 2 : 0,
+            flex: isMobile ? '1' : 'none',
+            justifyContent: isMobile ? 'center' : 'flex-start'
+          }}
+        >
+          {lastUpdateDate && (
+            <div 
+              className="update-info" 
+              onClick={() => { if (isMobile) { setShowMobileDateTooltip(!showMobileDateTooltip); setShowVisitorTooltip(false); } }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '4px', 
+                color: 'var(--text-secondary)', 
+                fontSize: '0.8rem', 
+                cursor: isMobile ? 'pointer' : 'default',
+                position: 'relative'
+              }} 
+              title={`Güncelleme Tarihi: ${lastUpdateDate}`}
+            >
+              <Info size={14} style={{ color: 'var(--primary-color)' }} />
+              <span style={{ display: isMobile ? 'none' : 'inline' }}>Güncelleme: {lastUpdateDate}</span>
+
+              {showMobileDateTooltip && isMobile && (
+                <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px', padding: '6px 12px', background: '#1e293b', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', zIndex: 1000, color: '#f8fafc', fontSize: '0.85rem', fontWeight: 500 }}>
+                  Güncelleme: {lastUpdateDate}
+                  <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid #1e293b' }} />
+                </div>
+              )}
+            </div>
+          )}
+
           <div 
-            className="update-info" 
-            onClick={() => { if (isMobile) setShowMobileDateTooltip(!showMobileDateTooltip); }}
+            className="visitor-info"
+            onClick={() => { if (isMobile) { setShowVisitorTooltip(!showVisitorTooltip); setShowMobileDateTooltip(false); } }}
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: '4px', 
               color: 'var(--text-secondary)', 
               fontSize: '0.8rem', 
-              position: isMobile ? 'static' : 'absolute', 
-              left: '50%', 
-              transform: isMobile ? 'none' : 'translateX(-50%)',
-              order: isMobile ? 2 : 0,
-              flex: isMobile ? '1' : 'none',
-              justifyContent: isMobile ? 'center' : 'flex-start',
-              cursor: isMobile ? 'pointer' : 'default'
-            }} 
-            title={`Güncelleme Tarihi: ${lastUpdateDate}`}
+              cursor: isMobile ? 'pointer' : 'default',
+              position: 'relative'
+            }}
+            title={`Ziyaretçi Sayısı: ${visitorCount}`}
           >
-            <Info size={14} style={{ color: 'var(--primary-color)' }} />
-            <span style={{ display: isMobile ? 'none' : 'inline' }}>Güncelleme: {lastUpdateDate}</span>
+            <Users size={14} style={{ color: 'var(--primary-color)' }} />
+            <span style={{ display: isMobile ? 'none' : 'inline' }}>Ziyaretçi: {visitorCount}</span>
 
-            {showMobileDateTooltip && isMobile && (
+            {showVisitorTooltip && isMobile && (
               <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px', padding: '6px 12px', background: '#1e293b', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', zIndex: 1000, color: '#f8fafc', fontSize: '0.85rem', fontWeight: 500 }}>
-                Güncelleme: {lastUpdateDate}
+                Ziyaretçi: {visitorCount}
                 <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid #1e293b' }} />
               </div>
             )}
           </div>
-        )}
+        </div>
 
         {totalPages > 1 && (
           <div className="pagination-controls" style={{ order: isMobile ? 3 : 0 }}>
