@@ -4,17 +4,17 @@
   height: 100%;
   animation: fadeIn 0.3s ease-out;
   min-height: 0;
-  
+
   /* Hem Mobil Hem Web İçin Ortak Saydamlık */
-  background: rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
 }
 
 /* Mobil kartların aşırı beyazını azaltmak için */
 @media (max-width: 768px) {
   .mobile-card.glass-panel {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.20) !important;
   }
 }
 
