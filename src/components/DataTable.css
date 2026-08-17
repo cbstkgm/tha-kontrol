@@ -8,7 +8,6 @@
   /* Hem Mobil Hem Web İçin Ortak Saydamlık */
   background: rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
 }
 
 /* Mobil kartların aşırı beyazını azaltmak için */
@@ -111,7 +110,6 @@
 .data-table th {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
@@ -461,9 +459,8 @@
   }
 
   .mobile-card {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(16px);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
