@@ -440,9 +440,9 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
               {(totalMuhammenBedel > 0 || totalSatisBedeli > 0) && (
                 <div style={{ display: 'flex', gap: '12px' }}>
                   {totalMuhammenBedel > 0 && (
-                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '6px 12px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '6px 12px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>Muhammen Toplam:</span>
-                      <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 700 }}>
+                      <span style={{ fontSize: '14px', color: '#ef4444', fontWeight: 700 }}>
                         {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalMuhammenBedel)}
                       </span>
                     </div>
@@ -504,7 +504,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
               {totalMuhammenBedel > 0 && (
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '10px', color: '#e2e8f0', fontWeight: 500 }}>M.Toplam:</span>
-                  <span style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 600 }}>
+                  <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>
                     {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalMuhammenBedel)}
                   </span>
                 </div>
