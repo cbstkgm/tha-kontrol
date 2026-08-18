@@ -701,3 +701,7 @@
     white-space: nowrap;
   }
 }
+  .mc-detail-item.full-width {
+    grid-column: span 2;
+  }
+

@@ -617,7 +617,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                           : val;
 
                         return (
-                          <div className="mc-detail-item" key={col.key}>
+                          <div className={`mc-detail-item ${isFiyat ? 'full-width' : ''}`} key={col.key}>
                             <span className="mc-detail-label" style={isFiyat ? { color: '#ef4444' } : {}}>{col.label}</span>
                             <span className="mc-detail-value" title={String(val)} style={isFiyat ? { color: '#ef4444', fontWeight: 'bold' } : {}}>
                               {displayVal}
