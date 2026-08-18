@@ -49,7 +49,7 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 
 function App() {
   const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(MUKERRER_CSV_FILENAME));
-  const [activeTab, setActiveTab] = useState<ViewTab>('mukerrer');
+  const [activeTab, setActiveTab] = useState<ViewTab>('toki');
   const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
   const [thaData, setThaData] = useState<ThaRecord[]>([]);

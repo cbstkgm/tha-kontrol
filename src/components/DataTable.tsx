@@ -117,6 +117,9 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
+  const [satildiChecked, setSatildiChecked] = useState(true);
+  const [satilmadiChecked, setSatilmadiChecked] = useState(true);
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
@@ -136,10 +139,39 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const totalPages = Math.ceil(data.length / pageSize);
+  const filteredData = useMemo(() => {
+    if (type !== 'toki') return data;
+    return data.filter(row => {
+      const isSatisBedeliDolu = row['satisbedeli'] !== undefined && row['satisbedeli'] !== null && String(row['satisbedeli']).trim() !== '' && String(row['satisbedeli']).trim() !== '-';
+      
+      if (satildiChecked && satilmadiChecked) return true;
+      if (!satildiChecked && !satilmadiChecked) return false;
+      
+      if (satildiChecked && isSatisBedeliDolu) return true;
+      if (satilmadiChecked && !isSatisBedeliDolu) return true;
+      
+      return false;
+    });
+  }, [data, type, satildiChecked, satilmadiChecked]);
+
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+
+  const totalSatisBedeli = useMemo(() => {
+    if (type !== 'toki') return 0;
+    return filteredData.reduce((acc, row) => {
+      let val = row['satisbedeli'] ?? row['satis_bedeli'];
+      if (val !== undefined && val !== null && String(val).trim() !== '' && String(val).trim() !== '-') {
+        const numVal = Number(String(val).replace(',', '.'));
+        if (!isNaN(numVal)) {
+          return acc + numVal;
+        }
+      }
+      return acc;
+    }, 0);
+  }, [filteredData, type]);
 
   const sortedData = useMemo(() => {
-    let sortableItems = [...data];
+    let sortableItems = [...filteredData];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
         let aValue = a[sortConfig.key];
@@ -225,7 +257,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
       });
     }
     return sortableItems;
-  }, [data, sortConfig]);
+  }, [filteredData, sortConfig]);
 
   const currentData = useMemo(() => {
     const startIdx = (currentPage - 1) * pageSize;
@@ -373,9 +405,34 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   return (
     <div className={`data-table-container glass-panel ${isMobile && mobileViewMode === 'table' ? 'view-mode-table' : ''}`}>
       <div className="table-header-controls">
-        <div className="table-title">
-          <h3>{type === 'tha' ? "Tescil Edilen THA'lar" : (type === 'mukerrer' ? "Mükerrer Parseller" : "Toki Satış Kayıtları")}</h3>
-          <span className="badge">{data.length} Kayıt</span>
+        <div className="table-title" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h3>{type === 'tha' ? "Tescil Edilen THA'lar" : (type === 'mukerrer' ? "Mükerrer Parseller" : "Toki Satış Kayıtları")}</h3>
+            <span className="badge">{filteredData.length} Kayıt</span>
+          </div>
+          {type === 'toki' && !isMobile && (
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '6px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', fontWeight: '500' }}>
+                  <input type="checkbox" checked={satildiChecked} onChange={e => setSatildiChecked(e.target.checked)} style={{ cursor: 'pointer' }} />
+                  Satıldı
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', fontWeight: '500' }}>
+                  <input type="checkbox" checked={satilmadiChecked} onChange={e => setSatilmadiChecked(e.target.checked)} style={{ cursor: 'pointer' }} />
+                  Satılmadı
+                </label>
+              </div>
+              
+              {totalSatisBedeli > 0 && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '6px 12px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>Toplam Satış:</span>
+                  <span style={{ fontSize: '14px', color: '#ef4444', fontWeight: 700 }}>
+                    {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisBedeli)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="table-header-actions">
@@ -405,6 +462,28 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
       </div>
 
       <div className="table-wrapper">
+        {isMobile && type === 'toki' && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', padding: '12px 16px', background: 'rgba(15, 23, 42, 0.4)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
+                <input type="checkbox" checked={satildiChecked} onChange={e => setSatildiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
+                Satıldı
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
+                <input type="checkbox" checked={satilmadiChecked} onChange={e => setSatilmadiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
+                Satılmadı
+              </label>
+            </div>
+            {totalSatisBedeli > 0 && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11px', color: '#e2e8f0', fontWeight: 500 }}>Toplam Satış:</span>
+                <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 600 }}>
+                  {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisBedeli)}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
         {isMobile && mobileViewMode === 'card' ? (
           <div className="mobile-card-list">
             {currentData.length === 0 ? (
@@ -616,7 +695,22 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                         }
                       }
 
-                      return <td key={col.key}>{val}</td>;
+                      let displayVal = val;
+                      const isSatisBedeli = col.key === 'satisbedeli' || col.key === 'satis_bedeli';
+                      const isFiyat = isSatisBedeli || col.key === 'muhammenbedel';
+                      
+                      if (isFiyat && val !== undefined && val !== null && String(val).trim() !== '' && String(val).trim() !== '-') {
+                        const numVal = Number(String(val).replace(',', '.'));
+                        if (!isNaN(numVal)) {
+                          displayVal = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(numVal);
+                        }
+                      }
+                      
+                      return (
+                        <td key={col.key} style={isSatisBedeli ? { color: '#ef4444', fontWeight: 500 } : undefined}>
+                          {displayVal}
+                        </td>
+                      );
                     })}
                   </tr>
                 );

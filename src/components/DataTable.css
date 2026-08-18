@@ -4,10 +4,6 @@
   height: 100%;
   animation: fadeIn 0.3s ease-out;
   min-height: 0;
-
-  /* Hem Mobil Hem Web İçin Ortak Saydamlık */
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(24px) !important;
 }
 
 /* Mobil kartların aşırı beyazını azaltmak için */
