@@ -638,8 +638,8 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
 
                           return (
                             <div className="mc-detail-item" key={col.key}>
-                              <span className="mc-detail-label" style={{ color: '#ef4444' }}>{col.label}</span>
-                              <span className="mc-detail-value" title={String(val)} style={{ color: '#ef4444', fontWeight: 'bold' }}>
+                              <span className="mc-detail-label" style={{ color: isSatisBedeli ? '#16a34a' : '#ef4444' }}>{col.label}</span>
+                              <span className="mc-detail-value" title={String(val)} style={{ color: isSatisBedeli ? '#16a34a' : '#ef4444', fontWeight: 'bold' }}>
                                 {displayVal}
                               </span>
                             </div>
@@ -728,7 +728,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                       }
                       
                       return (
-                        <td key={col.key} style={isSatisBedeli ? { color: '#ef4444', fontWeight: 500 } : undefined}>
+                        <td key={col.key} style={isSatisBedeli ? { color: '#16a34a', fontWeight: 500 } : undefined}>
                           {displayVal}
                         </td>
                       );
