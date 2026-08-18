@@ -207,7 +207,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                   <div className="tooltip-title" style={{ fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', marginBottom: '2px' }}>{f.label}</div>
                   <div className="tooltip-desc" style={{ fontWeight: 700, fontSize: '14px', color: '#111827', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '4px' }}>{f.adaParsel}</div>
                   <div style={{ maxHeight: '200px', overflowY: 'auto', textAlign: 'left', paddingRight: '4px' }}>
-                    {Object.entries(f.popupData).filter(([k,v]) => k !== 'geom' && k !== 'id' && v != null && String(v).trim() !== '').map(([k,v]) => (
+                    {Object.entries(f.popupData).filter(([k,v]) => k !== 'geom' && k !== 'id' && k !== 'toplamalan(m2)' && v != null && String(v).trim() !== '').map(([k,v]) => (
                       <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
                         <span style={{ color: '#6b7280', fontWeight: 600, marginRight: '12px' }}>{k}</span>
                         <span style={{ color: '#111827', fontWeight: 500, textAlign: 'right' }}>{String(v)}</span>
