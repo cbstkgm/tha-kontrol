@@ -597,7 +597,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                     <div className="mc-body">
                       <div className="mc-row">
                         <div className="mc-loc-text text-blue">
-                          <strong>A:</strong> <span className="mc-loc-main">{row.ilad}/{row.ilcead}-</span><span className="mc-loc-sub">{row.mahallead}</span>
+                          <span className="mc-loc-main">{row.ilad}/{row.ilcead}-</span><span className="mc-loc-sub">{row.mahallead}</span>
                         </div>
                         <span className="mc-badge-outline-blue">{row.adano}/{row.parselno}</span>
                       </div>
