@@ -12,9 +12,15 @@ interface HeaderProps {
   onOpenSqlModal?: () => void;
   mobileViewMode?: 'card' | 'table';
   setMobileViewMode?: (mode: 'card' | 'table') => void;
+  tokiCity?: string;
+  setTokiCity?: (city: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, setSearchQuery, onOpenSqlModal, mobileViewMode, setMobileViewMode }) => {
+const TURKEY_CITIES = [
+  "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "İstanbul", "İzmir", "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir", "Kilis", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+].sort((a, b) => a.localeCompare(b, 'tr'));
+
+const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, setSearchQuery, onOpenSqlModal, mobileViewMode, setMobileViewMode, tokiCity, setTokiCity }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -31,11 +37,16 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
     };
   }, []);
 
+  let appTitle = "Tescil Harici Alanlar";
+  if (activeTab === 'toki') appTitle = "THA Toki Satış";
+  else if (activeTab === 'mukerrer') appTitle = "THA Mükerrer Parseller";
+  else if (activeTab === 'tha') appTitle = "THA Tescil Edilen";
+
   return (
     <header className="app-header glass-panel">
       <div className="header-logo">
         <AnimatedLogo direction="right" />
-        <h1>Tescil Harici Alanlar</h1>
+        <h1>{appTitle}</h1>
         <AnimatedLogo direction="left" />
       </div>
 
@@ -137,16 +148,33 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
           )}
         </div>
 
-        <div className="search-container">
-          <Search size={18} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Tüm tablolarda ara..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="global-search-input"
-          />
-        </div>
+        {activeTab !== 'upload' && activeTab !== 'toki' && (
+          <div className="search-container">
+            <Search size={18} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Tüm tablolarda ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="global-search-input"
+            />
+          </div>
+        )}
+
+        {activeTab === 'toki' && setTokiCity && (
+          <div className="search-container" style={{ background: 'rgba(255, 255, 255, 0.9)', padding: '2px 12px' }}>
+            <select 
+              value={tokiCity || ''} 
+              onChange={e => setTokiCity(e.target.value)}
+              style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#334155', fontSize: '14px', cursor: 'pointer', padding: '6px 0' }}
+            >
+              <option value="">Tüm İller</option>
+              {TURKEY_CITIES.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
+          </div>
+        )}
         
         {setMobileViewMode && (
           <button 

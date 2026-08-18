@@ -12,7 +12,7 @@ import './App.css';
 
 export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
 export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
-export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis.csv';
+export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis_18.08.2026.csv';
 
 export const extractDateFromFilename = (filename: string) => {
   const match = filename.match(/_(.+?)\.csv/i);
@@ -48,7 +48,11 @@ const getWktCentroid = (wkt: string | undefined): [number, number] | undefined =
 };
 
 function App() {
-  const [lastUpdateDate, setLastUpdateDate] = useState<string>(extractDateFromFilename(MUKERRER_CSV_FILENAME));
+  const [updateDates, setUpdateDates] = useState({
+    tha: extractDateFromFilename(THA_CSV_FILENAME),
+    mukerrer: extractDateFromFilename(MUKERRER_CSV_FILENAME),
+    toki: extractDateFromFilename(TOKI_SATIS_CSV_FILENAME)
+  });
   const [activeTab, setActiveTab] = useState<ViewTab>('toki');
   const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
@@ -57,6 +61,7 @@ function App() {
   const [tokiData, setTokiData] = useState<TokiSatisRecord[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [tokiCity, setTokiCity] = useState<string>('');
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -139,9 +144,18 @@ function App() {
   }, [mukerrerData, searchQuery]);
 
   const filteredTokiData = useMemo(() => {
-    if (!searchQuery) return tokiData;
+    let result = tokiData;
+
+    if (tokiCity) {
+      result = result.filter(row => {
+        const rowCity = (row.ilad || '').toString().toLocaleLowerCase('tr-TR').trim();
+        return rowCity === tokiCity.toLocaleLowerCase('tr-TR').trim();
+      });
+    }
+
+    if (!searchQuery) return result;
     const normalizedQuery = normalizeSearch(searchQuery);
-    return tokiData.filter(row => {
+    return result.filter(row => {
       const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
       if (locString.includes(normalizedQuery)) return true;
 
@@ -150,7 +164,7 @@ function App() {
         return !k.includes('geom') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
       });
     });
-  }, [tokiData, searchQuery]);
+  }, [tokiData, searchQuery, tokiCity]);
 
 
 
@@ -289,12 +303,12 @@ function App() {
         if (row.geom) {
           try {
             if (parse(row.geom)) {
-              features.push({ 
-                wkt: row.geom, 
-                color: '#eab308', 
-                label: 'Toki Satış', 
-                adaParsel: `${row.adano || ''}/${row.parselno || ''}`, 
-                areaText: getWktArea(row.geom), 
+              features.push({
+                wkt: row.geom,
+                color: '#eab308',
+                label: 'Toki Satış',
+                adaParsel: `${row.adano || ''}/${row.parselno || ''}`,
+                areaText: getWktArea(row.geom),
                 centroid: getWktCentroid(row.geom),
                 popupData: row
               });
@@ -324,14 +338,16 @@ function App() {
         onOpenSqlModal={() => setIsSqlModalOpen(true)}
         mobileViewMode={mobileViewMode}
         setMobileViewMode={setMobileViewMode}
+        tokiCity={tokiCity}
+        setTokiCity={setTokiCity}
       />
 
       <main className="main-content">
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
-              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setLastUpdateDate(extractDateFromFilename(filename)); }}
+              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setUpdateDates(prev => ({...prev, tha: extractDateFromFilename(filename) || prev.tha})); }}
+              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setUpdateDates(prev => ({...prev, mukerrer: extractDateFromFilename(filename) || prev.mukerrer})); }}
             />
           )}
 
@@ -340,7 +356,7 @@ function App() {
               type="tha"
               data={filteredThaData}
               totalDataLength={thaData.length}
-              lastUpdateDate={lastUpdateDate}
+              lastUpdateDate={updateDates.tha}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               mobileViewMode={mobileViewMode}
@@ -352,7 +368,7 @@ function App() {
               type="mukerrer"
               data={filteredMukerrerData}
               totalDataLength={mukerrerData.length}
-              lastUpdateDate={lastUpdateDate}
+              lastUpdateDate={updateDates.mukerrer}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               mobileViewMode={mobileViewMode}
@@ -364,7 +380,7 @@ function App() {
               type="toki"
               data={filteredTokiData}
               totalDataLength={tokiData.length}
-              lastUpdateDate={lastUpdateDate}
+              lastUpdateDate={updateDates.toki}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}
               mobileViewMode={mobileViewMode}
