@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Tooltip, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
 import { X, Layers } from 'lucide-react';
 
 import { parse } from 'wellknown';
