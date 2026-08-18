@@ -59,16 +59,16 @@ function App() {
   const [thaData, setThaData] = useState<ThaRecord[]>([]);
   const [mukerrerData, setMukerrerData] = useState<MukerrerRecord[]>([]);
   const [tokiData, setTokiData] = useState<TokiSatisRecord[]>([]);
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInputs, setSearchInputs] = useState<Record<ViewTab, string>>({ tha: '', mukerrer: '', toki: '', upload: '' });
+  const [searchQueries, setSearchQueries] = useState<Record<ViewTab, string>>({ tha: '', mukerrer: '', toki: '', upload: '' });
   const [tokiCity, setTokiCity] = useState<string>('');
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setSearchQuery(searchInput);
+      setSearchQueries(searchInputs);
     }, 400); // 400ms debounce
     return () => clearTimeout(handler);
-  }, [searchInput]);
+  }, [searchInputs]);
 
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [checkedRowIds, setCheckedRowIds] = useState<Set<string>>(new Set());
@@ -116,8 +116,8 @@ function App() {
   const normalizeSearch = (s: string) => s.toLocaleLowerCase('tr-TR').replace(/\s*([/-])\s*/g, '$1');
 
   const filteredThaData = useMemo(() => {
-    if (!searchQuery) return thaData;
-    const normalizedQuery = normalizeSearch(searchQuery);
+    if (!searchQueries.tha) return thaData;
+    const normalizedQuery = normalizeSearch(searchQueries.tha);
     return thaData.filter(row => {
       const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
       if (locString.includes(normalizedQuery)) return true;
@@ -127,11 +127,11 @@ function App() {
         return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
       });
     });
-  }, [thaData, searchQuery]);
+  }, [thaData, searchQueries.tha]);
 
   const filteredMukerrerData = useMemo(() => {
-    if (!searchQuery) return mukerrerData;
-    const normalizedQuery = normalizeSearch(searchQuery);
+    if (!searchQueries.mukerrer) return mukerrerData;
+    const normalizedQuery = normalizeSearch(searchQueries.mukerrer);
     return mukerrerData.filter(row => {
       const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
       if (locString.includes(normalizedQuery)) return true;
@@ -141,7 +141,7 @@ function App() {
         return !k.includes('geom') && !k.includes('tarih') && !k.includes('yevmiye') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
       });
     });
-  }, [mukerrerData, searchQuery]);
+  }, [mukerrerData, searchQueries.mukerrer]);
 
   const tokiAvailableCities = useMemo(() => {
     const cities = new Set<string>();
@@ -163,8 +163,8 @@ function App() {
       });
     }
 
-    if (!searchQuery) return result;
-    const normalizedQuery = normalizeSearch(searchQuery);
+    if (!searchQueries.toki) return result;
+    const normalizedQuery = normalizeSearch(searchQueries.toki);
     return result.filter(row => {
       const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
       if (locString.includes(normalizedQuery)) return true;
@@ -174,7 +174,7 @@ function App() {
         return !k.includes('geom') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
       });
     });
-  }, [tokiData, searchQuery, tokiCity]);
+  }, [tokiData, searchQueries.toki, tokiCity]);
 
 
 
@@ -361,8 +361,8 @@ function App() {
       <Header
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        searchQuery={searchInput}
-        setSearchQuery={setSearchInput}
+        searchQuery={searchInputs[activeTab]}
+        setSearchQuery={(query) => setSearchInputs(prev => ({ ...prev, [activeTab]: query }))}
         onOpenSqlModal={() => setIsSqlModalOpen(true)}
         mobileViewMode={mobileViewMode}
         setMobileViewMode={setMobileViewMode}
