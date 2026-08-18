@@ -26,7 +26,10 @@ export const parseCSVString = <T>(text: string): Promise<T[]> => {
       skipEmptyLines: 'greedy',
       transformHeader: (header) => {
         const original = header.trim();
-        const h = original.toLowerCase()
+        const h = original
+          .replace(/İ/g, 'i')
+          .replace(/I/g, 'ı')
+          .toLowerCase()
           .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u')
           .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ç/g, 'c');
 
@@ -67,7 +70,9 @@ export const parseCSVString = <T>(text: string): Promise<T[]> => {
 
         if (cleanH === 'mukerrerparselgeom') return 'mukerrer_parsel_geom';
         if (cleanH === 'thageom') return 'tha_geom';
-        if (cleanH === 'wkt' || cleanH === 'geometry' || cleanH === 'geom') return 'geom';
+        if (cleanH === 'wkt' || cleanH === 'geometry' || cleanH === 'geom' || cleanH === 'parselgeom') return 'geom';
+
+        if (['tapualan', 'toplamalan(m2)', 'tokihissesi(m2)', 'imardurumu', 'satisbedeli', 'satisbirimbedeli', 'muhammenbedel', 'aciklama'].includes(cleanH)) return cleanH;
 
         return original;
       },

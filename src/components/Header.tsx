@@ -48,6 +48,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
           Mükerrer Parseller
         </button>
         <button
+          className={`nav-btn ${activeTab === 'toki' ? 'active' : ''}`}
+          onClick={() => setActiveTab('toki')}
+        >
+          <Database size={18} />
+          Toki Satış
+        </button>
+        <button
           className={`nav-btn ${activeTab === 'tha' ? 'active' : ''}`}
           onClick={() => setActiveTab('tha')}
         >
@@ -89,6 +96,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
               >
                 <Database size={16} />
                 Mükerrer Parseller
+              </button>
+              <button
+                className={`mobile-dropdown-item ${activeTab === 'toki' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('toki'); setIsMobileMenuOpen(false); }}
+              >
+                <Database size={16} />
+                Toki Satış
               </button>
               <button
                 className={`mobile-dropdown-item ${activeTab === 'tha' ? 'active' : ''}`}

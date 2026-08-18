@@ -7,11 +7,12 @@ import SqlModal from './components/SqlModal';
 import * as turf from '@turf/turf';
 import { parse } from 'wellknown';
 import { parseCSVString } from './utils/dataParsers';
-import type { ThaRecord, MukerrerRecord, ViewTab } from './types';
+import type { ThaRecord, MukerrerRecord, TokiSatisRecord, ViewTab } from './types';
 import './App.css';
 
 export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
 export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
+export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis.csv';
 
 export const extractDateFromFilename = (filename: string) => {
   const match = filename.match(/_(.+?)\.csv/i);
@@ -53,6 +54,7 @@ function App() {
 
   const [thaData, setThaData] = useState<ThaRecord[]>([]);
   const [mukerrerData, setMukerrerData] = useState<MukerrerRecord[]>([]);
+  const [tokiData, setTokiData] = useState<TokiSatisRecord[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -72,9 +74,10 @@ function App() {
   useEffect(() => {
     const loadDefaults = async () => {
       try {
-        const [thaRes, mukerrerRes] = await Promise.all([
+        const [thaRes, mukerrerRes, tokiRes] = await Promise.all([
           fetch(import.meta.env.BASE_URL + THA_CSV_FILENAME),
-          fetch(import.meta.env.BASE_URL + MUKERRER_CSV_FILENAME)
+          fetch(import.meta.env.BASE_URL + MUKERRER_CSV_FILENAME),
+          fetch(import.meta.env.BASE_URL + TOKI_SATIS_CSV_FILENAME)
         ]);
 
         if (thaRes.ok) {
@@ -89,6 +92,13 @@ function App() {
           const parsedMukerrer = await parseCSVString<MukerrerRecord>(mukerrerText);
           const dataWithIds = parsedMukerrer.map((row, i) => ({ ...row, id: `muk-${i}` }));
           setMukerrerData(dataWithIds);
+        }
+
+        if (tokiRes.ok) {
+          const tokiText = await tokiRes.text();
+          const parsedToki = await parseCSVString<TokiSatisRecord>(tokiText);
+          const dataWithIds = parsedToki.map((row, i) => ({ ...row, id: `toki-${i}` }));
+          setTokiData(dataWithIds);
         }
       } catch (err) {
         console.error("Default veri yüklenemedi", err);
@@ -128,6 +138,20 @@ function App() {
     });
   }, [mukerrerData, searchQuery]);
 
+  const filteredTokiData = useMemo(() => {
+    if (!searchQuery) return tokiData;
+    const normalizedQuery = normalizeSearch(searchQuery);
+    return tokiData.filter(row => {
+      const locString = normalizeSearch(`${row.ilad || ''}/${row.ilcead || ''}-${row.mahallead || ''}`);
+      if (locString.includes(normalizedQuery)) return true;
+
+      return Object.entries(row).some(([key, val]) => {
+        const k = key.toLowerCase();
+        return !k.includes('geom') && val != null && normalizeSearch(String(val)).includes(normalizedQuery);
+      });
+    });
+  }, [tokiData, searchQuery]);
+
 
 
   const handleRowCheck = (row: any, checked: boolean) => {
@@ -151,7 +175,7 @@ function App() {
     }
 
     let features: MapFeature[] = [];
-    const currentData = activeTab === 'tha' ? thaData : mukerrerData;
+    const currentData = activeTab === 'tha' ? thaData : (activeTab === 'mukerrer' ? mukerrerData : tokiData);
 
     checkedRowIds.forEach(rowId => {
       const row = currentData.find((r: any) => String(r.id) === rowId) as any;
@@ -261,13 +285,27 @@ function App() {
             console.error("Intersection failed", e);
           }
         }
-
-
+      } else if (activeTab === 'toki') {
+        if (row.geom) {
+          try {
+            if (parse(row.geom)) {
+              features.push({ 
+                wkt: row.geom, 
+                color: '#eab308', 
+                label: 'Toki Satış', 
+                adaParsel: `${row.adano || ''}/${row.parselno || ''}`, 
+                areaText: getWktArea(row.geom), 
+                centroid: getWktCentroid(row.geom),
+                popupData: row
+              });
+            } else { console.warn(`Toki Satış geometri bozuk/eksik: ${row.id}`); }
+          } catch (e) { console.warn(`Toki Satış parse edilemedi: ${row.id}`); }
+        }
       }
     });
 
     setMapFeatures(features);
-  }, [checkedRowIds, activeTab, thaData, mukerrerData]);
+  }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData]);
 
   const handleTabChange = (tab: ViewTab) => {
     setActiveTab(tab);
@@ -314,6 +352,18 @@ function App() {
               type="mukerrer"
               data={filteredMukerrerData}
               totalDataLength={mukerrerData.length}
+              lastUpdateDate={lastUpdateDate}
+              checkedRowIds={checkedRowIds}
+              onRowCheck={handleRowCheck}
+              mobileViewMode={mobileViewMode}
+            />
+          )}
+
+          {activeTab === 'toki' && (
+            <DataTable
+              type="toki"
+              data={filteredTokiData}
+              totalDataLength={tokiData.length}
               lastUpdateDate={lastUpdateDate}
               checkedRowIds={checkedRowIds}
               onRowCheck={handleRowCheck}

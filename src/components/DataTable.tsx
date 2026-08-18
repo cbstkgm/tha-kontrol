@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import './DataTable.css';
 
 interface DataTableProps {
-  type: 'tha' | 'mukerrer';
+  type: 'tha' | 'mukerrer' | 'toki';
   data: any[];
   checkedRowIds: Set<string>;
   onRowCheck: (row: any, checked: boolean) => void;
@@ -52,6 +52,20 @@ const thaColumns = [
   { key: 'basvuru_asama_durum', label: 'Aşama Durumu' },
   { key: 'tapu_tesciltarih', label: 'Tescil Tarihi' },
   { key: 'tapu_tescilyevmiyeno', label: 'Tescil Yevmiye No' }
+];
+
+const tokiColumns = [
+  { key: 'ilad', label: 'İl' },
+  { key: 'ilcead', label: 'İlçe' },
+  { key: 'mahallead', label: 'Mahalle' },
+  { key: 'adano', label: 'Ada No' },
+  { key: 'parselno', label: 'Parsel No' },
+  { key: 'tapualan', label: 'Tapu Alan (m²)' },
+  { key: 'toplamalan(m2)', label: 'Toplam Alan (m²)' },
+  { key: 'tokihissesi(m2)', label: 'Toki Hissesi (m²)' },
+  { key: 'imardurumu', label: 'İmar Durumu' },
+  { key: 'muhammenbedel', label: 'Muhammen Bedel' },
+  { key: 'satisbedeli', label: 'Satış Bedeli' },
 ];
 
 const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowCheck, mobileViewMode = 'card', totalDataLength, lastUpdateDate }) => {
@@ -165,6 +179,50 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         }
         return 0;
       });
+    } else {
+      sortableItems.sort((a, b) => {
+        const ilA = String(a.ilad || '').toLowerCase();
+        const ilB = String(b.ilad || '').toLowerCase();
+        if (ilA !== ilB) return ilA.localeCompare(ilB, 'tr');
+
+        const ilceA = String(a.ilcead || '').toLowerCase();
+        const ilceB = String(b.ilcead || '').toLowerCase();
+        if (ilceA !== ilceB) return ilceA.localeCompare(ilceB, 'tr');
+
+        const mahA = String(a.mahallead || '').toLowerCase();
+        const mahB = String(b.mahallead || '').toLowerCase();
+        if (mahA !== mahB) return mahA.localeCompare(mahB, 'tr');
+
+        const adaAKey = type === 'mukerrer' ? 'tha_ihdas_adano' : 'adano';
+        const adaAVal = a[adaAKey];
+        const adaBVal = b[adaAKey];
+        const adaNumA = Number(adaAVal);
+        const adaNumB = Number(adaBVal);
+        
+        if (!isNaN(adaNumA) && !isNaN(adaNumB) && String(adaAVal).trim() !== '' && String(adaBVal).trim() !== '') {
+            if (adaNumA !== adaNumB) return adaNumA - adaNumB;
+        } else {
+            const sA = String(adaAVal || '').toLowerCase();
+            const sB = String(adaBVal || '').toLowerCase();
+            if (sA !== sB) return sA.localeCompare(sB, 'tr');
+        }
+
+        const parselAKey = type === 'mukerrer' ? 'tha_ihdas_parselno' : 'parselno';
+        const parselAVal = a[parselAKey];
+        const parselBVal = b[parselAKey];
+        const parselNumA = Number(parselAVal);
+        const parselNumB = Number(parselBVal);
+        
+        if (!isNaN(parselNumA) && !isNaN(parselNumB) && String(parselAVal).trim() !== '' && String(parselBVal).trim() !== '') {
+            if (parselNumA !== parselNumB) return parselNumA - parselNumB;
+        } else {
+            const sA = String(parselAVal || '').toLowerCase();
+            const sB = String(parselBVal || '').toLowerCase();
+            if (sA !== sB) return sA.localeCompare(sB, 'tr');
+        }
+
+        return 0;
+      });
     }
     return sortableItems;
   }, [data, sortConfig]);
@@ -203,7 +261,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   };
 
   const handleExportExcel = useCallback(() => {
-    const cols = type === 'tha' ? thaColumns : mukerrerColumns;
+    const cols = type === 'tha' ? thaColumns : (type === 'mukerrer' ? mukerrerColumns : tokiColumns);
     const exportData = data.map(row => {
       const newRow: any = {};
       cols.forEach(col => {
@@ -230,12 +288,12 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Veriler");
-    const fileName = type === 'tha' ? 'tescil_edilen_thalar.xlsx' : 'mukerrer_parseller.xlsx';
+    const fileName = type === 'tha' ? 'tescil_edilen_thalar.xlsx' : (type === 'mukerrer' ? 'mukerrer_parseller.xlsx' : 'toki_satis.xlsx');
     XLSX.writeFile(workbook, fileName);
   }, [data, type]);
 
   const handleExportCSV = useCallback(() => {
-    const cols = type === 'tha' ? thaColumns : mukerrerColumns;
+    const cols = type === 'tha' ? thaColumns : (type === 'mukerrer' ? mukerrerColumns : tokiColumns);
     const exportData = data.map(row => {
       const newRow: any = {};
       cols.forEach(col => {
@@ -265,7 +323,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    const fileName = type === 'tha' ? 'tescil_edilen_thalar.csv' : 'mukerrer_parseller.csv';
+    const fileName = type === 'tha' ? 'tescil_edilen_thalar.csv' : (type === 'mukerrer' ? 'mukerrer_parseller.csv' : 'toki_satis.csv');
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
@@ -281,7 +339,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     };
   }, [handleExportExcel, handleExportCSV]);
 
-  const columns = type === 'tha' ? thaColumns : mukerrerColumns;
+  const columns = type === 'tha' ? thaColumns : (type === 'mukerrer' ? mukerrerColumns : tokiColumns);
 
   if (!isReadyToRender && (totalDataLength === undefined || totalDataLength > 0)) {
     return (
@@ -294,7 +352,9 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
           <p className="loading-desc">
             {type === 'tha' 
               ? 'Tescil edilen THA kayıtları işleniyor ve tablo oluşturuluyor.' 
-              : 'Mükerrer Parsel kayıtları işleniyor ve tablo oluşturuluyor.'}
+              : type === 'mukerrer' 
+              ? 'Mükerrer Parsel kayıtları işleniyor ve tablo oluşturuluyor.'
+              : 'Toki Satış kayıtları işleniyor ve tablo oluşturuluyor.'}
             <br />
             Lütfen bekleyin...
           </p>
@@ -314,7 +374,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
     <div className={`data-table-container glass-panel ${isMobile && mobileViewMode === 'table' ? 'view-mode-table' : ''}`}>
       <div className="table-header-controls">
         <div className="table-title">
-          <h3>{type === 'tha' ? "Tescil Edilen THA'lar" : "Mükerrer Parseller"}</h3>
+          <h3>{type === 'tha' ? "Tescil Edilen THA'lar" : (type === 'mukerrer' ? "Mükerrer Parseller" : "Toki Satış Kayıtları")}</h3>
           <span className="badge">{data.length} Kayıt</span>
         </div>
 
@@ -400,7 +460,7 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                     </div>
                   </div>
                 );
-              } else {
+              } else if (type === 'tha') {
                 return (
                   <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={() => handleRowClick(row, idx)}>
                     <div className="mc-header">
@@ -444,6 +504,48 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                     <div className="mc-footer">
                       <span className="mc-footer-label">YÜZÖLÇÜM</span>
                       <span className="mc-footer-value">{row.yuzolcum ? `${row.yuzolcum} m²` : '-'}</span>
+                    </div>
+                  </div>
+                );
+              } else {
+                // toki kartı
+                return (
+                  <div key={rowKey} className={`mobile-card glass-panel ${isRowActive ? 'active' : ''}`} onClick={() => handleRowClick(row, idx)}>
+                    <div className="mc-header">
+                      <span className="mc-index">#{globalIdx}</span>
+                      <span className="mc-badge" style={{ backgroundColor: '#eab308', color: '#fff' }}>Toki Satış</span>
+                    </div>
+                    <div className="mc-body">
+                      <div className="mc-row">
+                        <div className="mc-loc-text text-blue">
+                          <strong>A:</strong> <span className="mc-loc-main">{row.ilad}/{row.ilcead}-</span><span className="mc-loc-sub">{row.mahallead}</span>
+                        </div>
+                        <span className="mc-badge-outline-blue">{row.adano}/{row.parselno}</span>
+                      </div>
+                    </div>
+
+                    <div className="mc-details-grid">
+                      {columns.filter(c => !['ilad', 'ilcead', 'mahallead', 'adano', 'parselno'].includes(c.key)).map(col => {
+                        let val = row[col.key];
+                        const isSatisBedeli = col.key === 'satisbedeli' || col.key === 'satis_bedeli';
+                        
+                        if (!isSatisBedeli && (val === undefined || val === null || val === '')) return null;
+                        if (val === undefined || val === null || val === '') val = '-';
+
+                        const isFiyat = isSatisBedeli || col.key === 'muhammenbedel';
+                        const displayVal = (isFiyat && val !== '-' && !isNaN(Number(val))) 
+                          ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val)) 
+                          : val;
+
+                        return (
+                          <div className="mc-detail-item" key={col.key}>
+                            <span className="mc-detail-label" style={isFiyat ? { color: '#ef4444' } : {}}>{col.label}</span>
+                            <span className="mc-detail-value" title={String(val)} style={isFiyat ? { color: '#ef4444', fontWeight: 'bold' } : {}}>
+                              {displayVal}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );

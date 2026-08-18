@@ -27,6 +27,7 @@ export interface MapFeature {
   isHatched?: boolean;
   areaText?: string;
   centroid?: [number, number];
+  popupData?: any;
 }
 
 interface RightPanelMapProps {
@@ -108,7 +109,8 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             adaParsel: f.adaParsel,
             isHatched: f.isHatched,
             areaText: f.areaText,
-            centroid: f.centroid
+            centroid: f.centroid,
+            popupData: f.popupData
           });
         }
       });
@@ -150,12 +152,22 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     const showCard = currentZoom >= 16;
 
     let offsetLatLng: [number, number] | null = null;
-    if (f.centroid) {
-      if (f.isHatched) {
+    if (f.geoJson) {
+      if (f.label === 'Toki Satış' || f.popupData) {
+         try {
+           const bounds = L.geoJSON(f.geoJson).getBounds();
+           const ne = bounds.getNorthEast();
+           offsetLatLng = [ne.lat, ne.lng]; // Sağ üst köşe
+         } catch (e) {
+           offsetLatLng = f.centroid || null;
+         }
+      } else if (f.isHatched && f.centroid) {
          offsetLatLng = [f.centroid[0] + 0.0003, f.centroid[1] + 0.0008];
       } else {
-         offsetLatLng = f.centroid;
+         offsetLatLng = f.centroid || null;
       }
+    } else if (f.centroid) {
+       offsetLatLng = f.centroid;
     }
 
     return (
@@ -193,6 +205,19 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                   <div className="tooltip-title" style={{ fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', marginBottom: '4px' }}>Kesişen Alan</div>
                   {f.areaText && <div className="tooltip-desc" style={{ fontWeight: 700, fontSize: '14px', color: '#111827' }}>{f.areaText}</div>}
                 </>
+              ) : f.popupData ? (
+                <>
+                  <div className="tooltip-title" style={{ fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', marginBottom: '2px' }}>{f.label}</div>
+                  <div className="tooltip-desc" style={{ fontWeight: 700, fontSize: '14px', color: '#111827', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '4px' }}>{f.adaParsel}</div>
+                  <div style={{ maxHeight: '200px', overflowY: 'auto', textAlign: 'left', paddingRight: '4px' }}>
+                    {Object.entries(f.popupData).filter(([k,v]) => k !== 'geom' && k !== 'id' && v != null && String(v).trim() !== '').map(([k,v]) => (
+                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                        <span style={{ color: '#6b7280', fontWeight: 600, marginRight: '12px' }}>{k}</span>
+                        <span style={{ color: '#111827', fontWeight: 500, textAlign: 'right' }}>{String(v)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <>
                   {f.label && <div className="tooltip-title" style={{ fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', marginBottom: '2px' }}>{f.label}</div>}
@@ -214,10 +239,11 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                   icon={L.divIcon({ 
                     className: 'area-label-icon', 
                     html: `
-                      <div class="area-text-box" style="transform: scale(${scale}); transform-origin: ${f.isHatched ? 'top left' : 'center center'}; transition: transform 0.2s ease; border-color: ${f.color}; color: ${f.color};">
-                        <span style="font-size: 9px; color: #6b7280; text-transform: uppercase;">${f.label || (f.isHatched ? 'Kesişen Alan' : '')}</span>
-                        <strong style="display: block; font-size: 12px; color: #111827; margin-top: 1px;">${f.adaParsel || ''}</strong>
-                        ${f.areaText ? `<div style="font-size: 10px; margin-top: 2px;">${f.areaText}</div>` : ''}
+                      <div class="area-text-box" style="transform: scale(${scale}); transform-origin: ${f.popupData ? 'top right' : (f.isHatched ? 'top left' : 'center center')}; transition: transform 0.2s ease; border-color: ${f.color}; color: ${f.color}; ${f.popupData ? 'background: rgba(255,255,255,0.95); min-width: 180px;' : ''}">
+                        <span style="font-size: 9px; color: #6b7280; text-transform: uppercase; font-weight: bold;">${f.label || (f.isHatched ? 'Kesişen Alan' : '')}</span>
+                        <strong style="display: block; font-size: 12px; color: #111827; margin-top: 1px; ${f.popupData ? 'border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 4px;' : ''}">${f.adaParsel || ''}</strong>
+                        ${f.areaText && !f.popupData ? `<div style="font-size: 10px; margin-top: 2px;">${f.areaText}</div>` : ''}
+                        ${f.popupData ? Object.entries(f.popupData).filter(([k,v]) => ['imardurumu', 'tapualan', 'toplamalan(m2)', 'tokihissesi(m2)', 'muhammenbedel', 'satisbedeli'].includes(k.toLowerCase()) && v != null && String(v).trim() !== '').map(([k,v]) => `<div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:1px; line-height: 1.1;"><span style="color:#6b7280; margin-right:6px;">${k.substring(0,8).toUpperCase()}</span><span style="color:#111827; font-weight:500; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px;">${v}</span></div>`).join('') : ''}
                       </div>`,
                     iconSize: [100, 32]
                   })} 
@@ -244,6 +270,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
   const tescilliFeatures = parsedFeatures.filter(f => f.label === 'Tescilli THA');
   const mukerrerFeatures = parsedFeatures.filter(f => f.label === 'Mükerrer Parsel');
   const thaMukerrerFeatures = parsedFeatures.filter(f => f.label === 'THA (Mükerrer Tablo)');
+  const tokiFeatures = parsedFeatures.filter(f => f.label === 'Toki Satış');
   const kesisenFeatures = parsedFeatures.filter(f => f.isHatched);
 
   return (
@@ -308,6 +335,13 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                 <LayersControl.Overlay name="<span class='layer-lbl' data-color='#ea580c' style='color: #ea580c; font-weight: 600;'>THA (Mükerrer Tablo)</span>">
                   <LayerGroup>
                     {thaMukerrerFeatures.map((f, i) => renderFeature(f, i))}
+                  </LayerGroup>
+                </LayersControl.Overlay>
+              )}
+              {tokiFeatures.length > 0 && (
+                <LayersControl.Overlay checked name="<span class='layer-lbl' data-color='#eab308' style='color: #eab308; font-weight: 600;'>Toki Satış</span>">
+                  <LayerGroup>
+                    {tokiFeatures.map((f, i) => renderFeature(f, i))}
                   </LayerGroup>
                 </LayersControl.Overlay>
               )}
