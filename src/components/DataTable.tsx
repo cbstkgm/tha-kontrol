@@ -461,29 +461,29 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
         </div>
       </div>
 
-      <div className="table-wrapper">
-        {isMobile && type === 'toki' && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', padding: '12px 16px', background: 'rgba(15, 23, 42, 0.4)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
-                <input type="checkbox" checked={satildiChecked} onChange={e => setSatildiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
-                Satıldı
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
-                <input type="checkbox" checked={satilmadiChecked} onChange={e => setSatilmadiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
-                Satılmadı
-              </label>
-            </div>
-            {totalSatisBedeli > 0 && (
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '11px', color: '#e2e8f0', fontWeight: 500 }}>Toplam Satış:</span>
-                <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 600 }}>
-                  {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisBedeli)}
-                </span>
-              </div>
-            )}
+      {isMobile && type === 'toki' && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', padding: '12px 16px', background: 'rgba(15, 23, 42, 0.4)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
+              <input type="checkbox" checked={satildiChecked} onChange={e => setSatildiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
+              Satıldı
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>
+              <input type="checkbox" checked={satilmadiChecked} onChange={e => setSatilmadiChecked(e.target.checked)} style={{ width: '16px', height: '16px' }} />
+              Satılmadı
+            </label>
           </div>
-        )}
+          {totalSatisBedeli > 0 && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '11px', color: '#e2e8f0', fontWeight: 500 }}>Toplam Satış:</span>
+              <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 600 }}>
+                {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisBedeli)}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+      <div className="table-wrapper">
         {isMobile && mobileViewMode === 'card' ? (
           <div className="mobile-card-list">
             {currentData.length === 0 ? (
