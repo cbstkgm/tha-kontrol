@@ -604,27 +604,48 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
                     </div>
 
                     <div className="mc-details-grid">
-                      {columns.filter(c => !['ilad', 'ilcead', 'mahallead', 'adano', 'parselno'].includes(c.key)).map(col => {
-                        let val = row[col.key];
-                        const isSatisBedeli = col.key === 'satisbedeli' || col.key === 'satis_bedeli';
-                        
-                        if (!isSatisBedeli && (val === undefined || val === null || val === '')) return null;
-                        if (val === undefined || val === null || val === '') val = '-';
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {columns.filter(c => !['ilad', 'ilcead', 'mahallead', 'adano', 'parselno'].includes(c.key)).map(col => {
+                          let val = row[col.key];
+                          const isSatisBedeli = col.key === 'satisbedeli' || col.key === 'satis_bedeli';
+                          const isFiyat = isSatisBedeli || col.key === 'muhammenbedel';
+                          
+                          if (isFiyat) return null;
+                          if (val === undefined || val === null || val === '') return null;
 
-                        const isFiyat = isSatisBedeli || col.key === 'muhammenbedel';
-                        const displayVal = (isFiyat && val !== '-' && !isNaN(Number(val))) 
-                          ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val)) 
-                          : val;
+                          return (
+                            <div className="mc-detail-item" key={col.key}>
+                              <span className="mc-detail-label">{col.label}</span>
+                              <span className="mc-detail-value" title={String(val)}>{val}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {columns.filter(c => !['ilad', 'ilcead', 'mahallead', 'adano', 'parselno'].includes(c.key)).map(col => {
+                          let val = row[col.key];
+                          const isSatisBedeli = col.key === 'satisbedeli' || col.key === 'satis_bedeli';
+                          const isFiyat = isSatisBedeli || col.key === 'muhammenbedel';
+                          
+                          if (!isFiyat) return null;
+                          if (!isSatisBedeli && (val === undefined || val === null || val === '')) return null;
+                          if (val === undefined || val === null || val === '') val = '-';
 
-                        return (
-                          <div className={`mc-detail-item ${isFiyat ? 'full-width' : ''}`} key={col.key}>
-                            <span className="mc-detail-label" style={isFiyat ? { color: '#ef4444' } : {}}>{col.label}</span>
-                            <span className="mc-detail-value" title={String(val)} style={isFiyat ? { color: '#ef4444', fontWeight: 'bold' } : {}}>
-                              {displayVal}
-                            </span>
-                          </div>
-                        );
-                      })}
+                          const displayVal = (val !== '-' && !isNaN(Number(val))) 
+                            ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val)) 
+                            : val;
+
+                          return (
+                            <div className="mc-detail-item" key={col.key}>
+                              <span className="mc-detail-label" style={{ color: '#ef4444' }}>{col.label}</span>
+                              <span className="mc-detail-value" title={String(val)} style={{ color: '#ef4444', fontWeight: 'bold' }}>
+                                {displayVal}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 );
