@@ -35,6 +35,7 @@ interface RightPanelMapProps {
   onClose: () => void;
   features: MapFeature[];
   focusFeatures?: MapFeature[];
+  titleInfo?: string;
 }
 
 const ZoomTracker = ({ onZoomChange }: { onZoomChange: (z: number) => void }) => {
@@ -84,7 +85,7 @@ const MapController = ({ focusFeatures }: { focusFeatures?: { geoJson: any }[] }
   return null;
 };
 
-const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, onClose }) => {
+const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, titleInfo, onClose }) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const [parsedFeatures, setParsedFeatures] = useState<{geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number]}[]>([]);
   const [parsedFocusFeatures, setParsedFocusFeatures] = useState<{geoJson: any}[]>([]);
@@ -275,9 +276,12 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
       ref={panelRef} 
       className={`right-panel-map ${isOpen ? 'open' : ''}`}
     >
-      <div className="panel-header">
-        <h3>Harita Görünümü</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="panel-header" style={{ alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <h3 style={{ margin: 0, lineHeight: 1 }}>Harita Görünümü</h3>
+          {titleInfo && <span style={{ fontSize: '13px', color: '#ffffff', opacity: 0.9, fontWeight: 500, lineHeight: 1.2 }}>{titleInfo}</span>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '-2px' }}>
           <button className="close-btn" onClick={onClose}>
             <X size={20} />
           </button>

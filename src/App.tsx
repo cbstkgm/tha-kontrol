@@ -331,6 +331,24 @@ function App() {
     setMapFeatures(features);
   }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData]);
 
+  const mapPanelTitleInfo = useMemo(() => {
+    if (checkedRowIds.size === 0) return undefined;
+    
+    const currentData = activeTab === 'tha' ? thaData : (activeTab === 'mukerrer' ? mukerrerData : tokiData);
+    const firstId = Array.from(checkedRowIds)[0];
+    const row = currentData.find((r: any) => String(r.id) === firstId) as any;
+    
+    if (!row) return undefined;
+    
+    const il = row.ilad || '';
+    const ilce = row.ilcead || '';
+    const mah = row.mahallead || '';
+    const ada = row.adano || row.tha_ihdas_adano || row.mukerrer_adano || '';
+    const parsel = row.parselno || row.tha_ihdas_parselno || row.mukerrer_parselno || '';
+    
+    return `${il} / ${ilce} - ${mah} | Ada/Parsel: ${ada}/${parsel}`;
+  }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData]);
+
   const handleTabChange = (tab: ViewTab) => {
     setActiveTab(tab);
     setIsMapPanelOpen(false);
@@ -403,6 +421,7 @@ function App() {
           isOpen={isMapPanelOpen}
           features={mapFeatures}
           focusFeatures={mapFeatures}
+          titleInfo={mapPanelTitleInfo}
           onClose={() => {
             setIsMapPanelOpen(false);
             setCheckedRowIds(new Set());
