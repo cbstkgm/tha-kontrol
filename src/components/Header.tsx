@@ -159,6 +159,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
               onChange={(e) => setSearchQuery(e.target.value)}
               className="global-search-input"
             />
+            {searchQuery && (
+              <button 
+                className="clear-search-btn" 
+                onClick={() => setSearchQuery('')}
+                title="Aramayı temizle"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         )}
 
