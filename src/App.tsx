@@ -143,6 +143,16 @@ function App() {
     });
   }, [mukerrerData, searchQuery]);
 
+  const tokiAvailableCities = useMemo(() => {
+    const cities = new Set<string>();
+    tokiData.forEach(row => {
+      if (row.ilad) {
+        cities.add(row.ilad.toString().toLocaleLowerCase('tr-TR').trim());
+      }
+    });
+    return cities;
+  }, [tokiData]);
+
   const filteredTokiData = useMemo(() => {
     let result = tokiData;
 
@@ -340,6 +350,7 @@ function App() {
         setMobileViewMode={setMobileViewMode}
         tokiCity={tokiCity}
         setTokiCity={setTokiCity}
+        tokiAvailableCities={tokiAvailableCities}
       />
 
       <main className="main-content">

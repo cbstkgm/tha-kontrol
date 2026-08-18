@@ -14,13 +14,14 @@ interface HeaderProps {
   setMobileViewMode?: (mode: 'card' | 'table') => void;
   tokiCity?: string;
   setTokiCity?: (city: string) => void;
+  tokiAvailableCities?: Set<string>;
 }
 
 const TURKEY_CITIES = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "İstanbul", "İzmir", "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir", "Kilis", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
 ].sort((a, b) => a.localeCompare(b, 'tr'));
 
-const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, setSearchQuery, onOpenSqlModal, mobileViewMode, setMobileViewMode, tokiCity, setTokiCity }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, setSearchQuery, onOpenSqlModal, mobileViewMode, setMobileViewMode, tokiCity, setTokiCity, tokiAvailableCities }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -169,9 +170,18 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
               style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#334155', fontSize: '14px', cursor: 'pointer', padding: '6px 0' }}
             >
               <option value="">Tüm İller</option>
-              {TURKEY_CITIES.map(city => (
-                <option key={city} value={city}>{city}</option>
-              ))}
+              {TURKEY_CITIES.map(city => {
+                const isAvailable = tokiAvailableCities?.has(city.toLocaleLowerCase('tr-TR'));
+                return (
+                  <option 
+                    key={city} 
+                    value={city}
+                    style={{ color: isAvailable ? '#16a34a' : 'inherit', fontWeight: isAvailable ? '600' : 'normal' }}
+                  >
+                    {city} {isAvailable ? '✓' : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
         )}
