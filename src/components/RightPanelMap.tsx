@@ -98,7 +98,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
   useEffect(() => {
     if (isOpen && features.length > 0) {
-      const parsed: {geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number]}[] = [];
+      const parsed: {geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number], popupData?: any}[] = [];
       features.forEach(f => {
         const geoJson = f.geoJson || (f.wkt ? parseWKT(f.wkt) : null);
         if (geoJson) {
