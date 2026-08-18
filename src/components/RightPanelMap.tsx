@@ -90,7 +90,19 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
   const [parsedFocusFeatures, setParsedFocusFeatures] = useState<{geoJson: any}[]>([]);
   const [currentZoom, setCurrentZoom] = useState<number>(6);
   const [activeBaseLayer, setActiveBaseLayer] = useState<string>('Google Uydu');
-  const [showLayers, setShowLayers] = useState<boolean>(true);
+  const [showLayers, setShowLayers] = useState<boolean>(window.innerWidth > 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setShowLayers(true);
+      } else {
+        setShowLayers(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleZoomChange = React.useCallback((z: number) => {
     setCurrentZoom(z);
@@ -149,7 +161,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
   const renderFeature = (f: any, idx: number) => {
     const scale = currentZoom >= 18 ? 1 : Math.pow(2, currentZoom - 18);
-    const showCard = currentZoom >= 16;
+    const showCard = false;
 
     let offsetLatLng: [number, number] | null = null;
     if (f.geoJson) {
@@ -182,22 +194,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             fillOpacity: f.isHatched ? 0.8 : 0.2 
           }} 
         >
-          <Tooltip direction="top" offset={[0, -10]} className="custom-map-label" sticky>
-            <div className="tooltip-content">
-              {f.isHatched ? (
-                <>
-                  <div className="tooltip-title">Kesişen Alan</div>
-                  {f.areaText && <div className="tooltip-desc">{f.areaText}</div>}
-                </>
-              ) : (
-                <>
-                  {f.label && <div className="tooltip-title">{f.label}</div>}
-                  {f.adaParsel && <div className="tooltip-desc">{f.adaParsel}</div>}
-                  {f.areaText && <div className="tooltip-area" style={{ marginTop: '4px', fontSize: '11px', fontWeight: 600, color: '#4b5563', padding: '2px 4px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}>{f.areaText}</div>}
-                </>
-              )}
-            </div>
-          </Tooltip>
+
           <Popup className="custom-map-popup">
             <div className="tooltip-content" style={{ margin: 0, padding: '4px', textAlign: 'center' }}>
               {f.isHatched ? (
@@ -362,6 +359,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
         >
           <Layers size={22} />
         </button>
+
       </div>
     </div>
   );

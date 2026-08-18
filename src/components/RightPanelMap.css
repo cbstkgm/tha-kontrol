@@ -238,3 +238,15 @@
     top: 64px;
   }
 }
+
+@media (max-width: 768px) {
+  .leaflet-top.leaflet-right .leaflet-control-layers {
+    margin-top: 64px !important;
+  }
+}
+
+
+.layers-closed .leaflet-control-layers {
+  display: none !important;
+}
+
