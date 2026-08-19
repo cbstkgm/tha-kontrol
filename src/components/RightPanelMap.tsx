@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
 import { X, Layers } from 'lucide-react';
 
@@ -43,14 +43,15 @@ interface RightPanelMapProps {
   cityParcelsList?: any[];
 }
 
-const ZoomTracker = ({ onZoomChange }: { onZoomChange: (z: number) => void }) => {
+const MapStateTracker = ({ onStateChange }: { onStateChange: (z: number, b: L.LatLngBounds) => void }) => {
   const map = useMapEvents({
-    zoomend: () => onZoomChange(map.getZoom()),
-    moveend: () => onZoomChange(map.getZoom()),
+    zoomend: () => onStateChange(map.getZoom(), map.getBounds()),
+    moveend: () => onStateChange(map.getZoom(), map.getBounds()),
+    resize: () => onStateChange(map.getZoom(), map.getBounds()),
   });
   useEffect(() => {
-    onZoomChange(map.getZoom());
-  }, [map, onZoomChange]);
+    onStateChange(map.getZoom(), map.getBounds());
+  }, [map, onStateChange]);
   return null;
 };
 
@@ -99,6 +100,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
   const [activeBaseLayer, setActiveBaseLayer] = useState<string>('Google Uydu');
   const [showLayers, setShowLayers] = useState<boolean>(window.innerWidth > 768);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true); // Add sidebar toggle state
+  const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -112,9 +114,25 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleZoomChange = React.useCallback((z: number) => {
+  const handleStateChange = React.useCallback((z: number, b: L.LatLngBounds) => {
     setCurrentZoom(z);
+    setVisibleBounds(b);
   }, []);
+
+  const visibleFeaturesMap = useMemo(() => {
+    if (!visibleBounds || parsedFeatures.length === 0) return {};
+    const visible: Record<string, string> = {};
+    parsedFeatures.forEach(f => {
+      if (!f.id || f.isHatched) return;
+      if (f.centroid) {
+         const latLng = L.latLng(f.centroid[0], f.centroid[1]);
+         if (visibleBounds.contains(latLng)) {
+            visible[f.id] = f.color;
+         }
+      }
+    });
+    return visible;
+  }, [visibleBounds, parsedFeatures]);
 
   useEffect(() => {
     if (isOpen && features.length > 0) {
@@ -355,7 +373,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
               </defs>
             </svg>
             <MapController focusFeatures={sidebarFocusFeature ? [sidebarFocusFeature] : parsedFocusFeatures} />
-            <ZoomTracker onZoomChange={handleZoomChange} />
+            <MapStateTracker onStateChange={handleStateChange} />
             <div className="zoom-indicator" style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, color: '#374151', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', zIndex: 1000, border: '1px solid rgba(0,0,0,0.1)' }}>
               Zoom: {currentZoom.toFixed(1)}
             </div>
@@ -419,16 +437,35 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                   <h4>İl Parselleri ({cityParcelsList.length})</h4>
                 </div>
                 <div className="sidebar-list">
-                  {cityParcelsList.map((parcel, idx) => (
-                    <div 
-                      key={parcel.id || idx} 
-                      className="sidebar-list-item"
-                      onClick={() => parcel.id && handleSidebarClick(parcel.id)}
-                    >
-                      <div className="parcel-location">{parcel.ilcead} - {parcel.mahallead}</div>
-                      <div className="parcel-ada">Ada/Parsel: {parcel.adaParsel}</div>
-                    </div>
-                  ))}
+                  {cityParcelsList.map((parcel, idx) => {
+                    const dotColor = parcel.id ? visibleFeaturesMap[String(parcel.id)] : null;
+                    return (
+                      <div 
+                        key={parcel.id || idx} 
+                        className="sidebar-list-item"
+                        onClick={() => parcel.id && handleSidebarClick(parcel.id)}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                      >
+                        <div>
+                          <div className="parcel-location">{parcel.ilcead} - {parcel.mahallead}</div>
+                          <div className="parcel-ada">Ada/Parsel: {parcel.adaParsel}</div>
+                        </div>
+                        {dotColor && (
+                          <div 
+                            title="Şu an ekranda görünüyor"
+                            style={{ 
+                              width: '10px', 
+                              height: '10px', 
+                              borderRadius: '50%', 
+                              backgroundColor: dotColor, 
+                              boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+                              flexShrink: 0
+                            }} 
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
