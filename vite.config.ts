@@ -5,4 +5,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/tha-makam/',
+  server: {
+    proxy: {
+      '/tkgm-wms': {
+        target: 'https://cbsservis.tkgm.gov.tr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/tkgm-wms/, '/tkgm.ows/wms'),
+        auth: 'tk41671:Jackass+0078',
+        secure: false,
+      }
+    }
+  }
 })

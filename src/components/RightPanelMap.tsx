@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, useMap, useMapEvents, Popup, Polyline, Marker, LayersControl, LayerGroup } from 'react-leaflet';
 import { X, Layers } from 'lucide-react';
 
 import { parse } from 'wellknown';
@@ -389,6 +389,30 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                   <TileLayer url={layer.url} attribution={layer.attribution} maxNativeZoom={18} maxZoom={22} />
                 </LayersControl.BaseLayer>
               ))}
+
+              <LayersControl.BaseLayer checked={activeBaseLayer === 'TKGM WMS Altlık'} name="TKGM WMS Altlık">
+                <WMSTileLayer 
+                  url="/tkgm-wms"
+                  layers="TKGM:parseller"
+                  format="image/png"
+                  transparent={true}
+                  version="1.1.1"
+                  attribution="&copy; TKGM"
+                  maxZoom={22}
+                />
+              </LayersControl.BaseLayer>
+
+              <LayersControl.Overlay name="<span class='layer-lbl' data-color='#2563eb' style='color: #2563eb; font-weight: 600;'>TKGM Parseller (WMS Katmanı)</span>">
+                <WMSTileLayer 
+                  url="/tkgm-wms"
+                  layers="TKGM:parseller"
+                  format="image/png"
+                  transparent={true}
+                  version="1.1.1"
+                  attribution="&copy; TKGM"
+                  maxZoom={22}
+                />
+              </LayersControl.Overlay>
               {tescilliFeatures.length > 0 && (
                 <LayersControl.Overlay checked name="<span class='layer-lbl' data-color='#16a34a' style='color: #16a34a; font-weight: 600;'>Tescilli THA</span>">
                   <LayerGroup>
