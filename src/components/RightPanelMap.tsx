@@ -392,7 +392,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
               <LayersControl.BaseLayer checked={activeBaseLayer === 'TKGM WMS Altlık'} name="TKGM WMS Altlık">
                 <WMSTileLayer 
-                  url="/tkgm-wms"
+                  url="https://tk41671:Jackass%2B0078@cbsservis.tkgm.gov.tr/tkgm.ows/wms"
                   layers="TKGM:parseller"
                   format="image/png"
                   transparent={true}
@@ -404,7 +404,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
               <LayersControl.Overlay name="<span class='layer-lbl' data-color='#2563eb' style='color: #2563eb; font-weight: 600;'>TKGM Parseller (WMS Katmanı)</span>">
                 <WMSTileLayer 
-                  url="/tkgm-wms"
+                  url="https://tk41671:Jackass%2B0078@cbsservis.tkgm.gov.tr/tkgm.ows/wms"
                   layers="TKGM:parseller"
                   format="image/png"
                   transparent={true}
