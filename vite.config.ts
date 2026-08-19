@@ -10,7 +10,7 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, _res, next) => {
           if (req.url === '/' || req.url === '/tha-makam/' || req.url === '/tha-makam/index.html') {
-            req.url = '/index.dev.html';
+            req.url = '/tha-makam/index.dev.html';
           }
           next();
         });
