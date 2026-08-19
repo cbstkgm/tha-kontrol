@@ -62,7 +62,6 @@ const tokiColumns = [
   { key: 'parselno', label: 'Parsel No' },
   { key: 'tapualan', label: 'Tapu Alan (m²)' },
 
-  { key: 'tokihissesi(m2)', label: 'Toki Hissesi (m²)' },
   { key: 'imardurumu', label: 'İmar Durumu' },
   { key: 'muhammenbedel', label: 'Muhammen Bedel' },
   { key: 'satisbedeli', label: 'Satış Bedeli' },
