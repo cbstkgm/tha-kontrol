@@ -79,8 +79,8 @@ const DataTable: React.FC<DataTableProps> = ({ type, data, checkedRowIds, onRowC
   useEffect(() => {
     const hasVisited = sessionStorage.getItem('has_visited');
     const endpoint = hasVisited 
-      ? 'https://countapi.mileshilliard.com/api/v1/get/cbstkgm-tha-kontrol-visitor-count'
-      : 'https://countapi.mileshilliard.com/api/v1/hit/cbstkgm-tha-kontrol-visitor-count';
+      ? 'https://countapi.mileshilliard.com/api/v1/get/cbstkgm-tha-makam-visitor-count'
+      : 'https://countapi.mileshilliard.com/api/v1/hit/cbstkgm-tha-makam-visitor-count';
       
     fetch(endpoint)
       .then(res => res.json())

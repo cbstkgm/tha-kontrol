@@ -4,7 +4,7 @@ Bu proje, tescil harici alanlar (THA) ile mükerrer parsellerin coğrafi analizl
 
 <div align="center">
   <br/>
-    <a href="https://cbstkgm.github.io/tha-kontrol/">
+    <a href="https://cbstkgm.github.io/tha-makam/">
     <img src="https://img.shields.io/badge/🚀_Canlı_Demo-Görüntüle-2563eb?style=for-the-badge&logo=react" alt="Demo Butonu" />
   </a>
   <br/><br/>
