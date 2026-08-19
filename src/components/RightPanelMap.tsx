@@ -220,8 +220,9 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     }
 
     return (
-      <React.Fragment key={idx}>
+      <React.Fragment key={f.id || idx}>
           <GeoJSON 
+            key={f.id ? `${f.id}-${f.isHatched ? 'hatched' : 'base'}` : idx}
             data={f.geoJson} 
             pathOptions={{ 
               color: f.color, 
