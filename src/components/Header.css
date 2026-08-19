@@ -8,6 +8,9 @@
   border-radius: 16px;
   z-index: 1100;
   position: relative;
+  background: rgba(221, 226, 250, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .header-logo {
