@@ -74,6 +74,8 @@ function App() {
   const [checkedRowIds, setCheckedRowIds] = useState<Set<string>>(new Set());
   const [isMapPanelOpen, setIsMapPanelOpen] = useState(false);
   const [isSqlModalOpen, setIsSqlModalOpen] = useState(false);
+  const [showCityParcels, setShowCityParcels] = useState(false);
+  const [cityParcelsList, setCityParcelsList] = useState<any[]>([]);
 
   // Load default datasets
   useEffect(() => {
@@ -201,15 +203,41 @@ function App() {
     let features: MapFeature[] = [];
     const currentData = activeTab === 'tha' ? thaData : (activeTab === 'mukerrer' ? mukerrerData : tokiData);
 
+    const selectedCities = new Set<string>();
     checkedRowIds.forEach(rowId => {
       const row = currentData.find((r: any) => String(r.id) === rowId) as any;
+      if (row && row.ilad) {
+        selectedCities.add(row.ilad.toString().toLocaleLowerCase('tr-TR').trim());
+      }
+    });
+
+    let dataToProcess = [];
+    if (showCityParcels && selectedCities.size > 0) {
+      dataToProcess = currentData.filter((r: any) => r.ilad && selectedCities.has(r.ilad.toString().toLocaleLowerCase('tr-TR').trim()));
+      
+      const list = dataToProcess.map((r: any) => ({
+        id: r.id,
+        ilad: r.ilad,
+        ilcead: r.ilcead,
+        mahallead: r.mahallead,
+        adaParsel: `${r.adano || r.mukerrer_adano || r.tha_ihdas_adano || ''}/${r.parselno || r.mukerrer_parselno || r.tha_ihdas_parselno || ''}`
+      }));
+      setCityParcelsList(list);
+    } else {
+      dataToProcess = currentData.filter((r: any) => checkedRowIds.has(String(r.id)));
+      setCityParcelsList([]);
+    }
+
+    dataToProcess.forEach((row: any) => {
       if (!row) return;
+      const isFocused = checkedRowIds.has(String(row.id));
+      const baseOpacity = isFocused ? 1 : (showCityParcels ? 0.35 : 1);
 
       if (activeTab === 'tha') {
         if (row.geom) {
           try {
             if (parse(row.geom)) {
-              features.push({ wkt: row.geom, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${row.adano}/${row.parselno}`, areaText: getWktArea(row.geom), centroid: getWktCentroid(row.geom) }); // Green for THA
+              features.push({ id: row.id, wkt: row.geom, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${row.adano}/${row.parselno}`, areaText: getWktArea(row.geom), centroid: getWktCentroid(row.geom), opacity: baseOpacity }); // Green for THA
             } else { console.warn(`Tescilli THA geometri bozuk/eksik: ${row.id}`); }
           } catch (e) { console.warn(`Tescilli THA parse edilemedi: ${row.id}`); }
         }
@@ -220,7 +248,7 @@ function App() {
           if (m.mukerrer_parsel_geom) {
             try {
               if (parse(m.mukerrer_parsel_geom)) {
-                features.push({ wkt: m.mukerrer_parsel_geom, color: '#9333ea', label: 'Mükerrer Parsel', adaParsel: `${m.mukerrer_adano}/${m.mukerrer_parselno}`, areaText: getWktArea(m.mukerrer_parsel_geom), centroid: getWktCentroid(m.mukerrer_parsel_geom) });
+                features.push({ id: row.id, wkt: m.mukerrer_parsel_geom, color: '#9333ea', label: 'Mükerrer Parsel', adaParsel: `${m.mukerrer_adano}/${m.mukerrer_parselno}`, areaText: getWktArea(m.mukerrer_parsel_geom), centroid: getWktCentroid(m.mukerrer_parsel_geom), opacity: baseOpacity });
 
                 const geo1 = parse(row.geom);
                 const geo2 = parse(m.mukerrer_parsel_geom);
@@ -255,7 +283,7 @@ function App() {
         if (mukerrerWkt) {
           try {
             if (parse(mukerrerWkt)) {
-              features.push({ wkt: mukerrerWkt, color: '#9333ea', label: 'Mükerrer Parsel', adaParsel: `${row.mukerrer_adano}/${row.mukerrer_parselno}`, areaText: getWktArea(mukerrerWkt), centroid: getWktCentroid(mukerrerWkt) }); // Purple for Mukerrer
+              features.push({ id: row.id, wkt: mukerrerWkt, color: '#9333ea', label: 'Mükerrer Parsel', adaParsel: `${row.mukerrer_adano}/${row.mukerrer_parselno}`, areaText: getWktArea(mukerrerWkt), centroid: getWktCentroid(mukerrerWkt), opacity: baseOpacity }); // Purple for Mukerrer
             } else { console.warn(`Mükerrer geometri bozuk/eksik: ${row.id}`); }
           } catch (e) { console.warn(`Mükerrer geometri parse edilemedi: ${row.id}`); }
         }
@@ -263,18 +291,17 @@ function App() {
         if (thaWkt) {
           try {
             if (parse(thaWkt)) {
-              features.push({ wkt: thaWkt, color: '#ea580c', label: 'THA (Mükerrer Tablo)', adaParsel: `${row.tha_ihdas_adano}/${row.tha_ihdas_parselno}`, areaText: getWktArea(thaWkt), centroid: getWktCentroid(thaWkt) });
+              features.push({ id: row.id, wkt: thaWkt, color: '#ea580c', label: 'THA (Mükerrer Tablo)', adaParsel: `${row.tha_ihdas_adano}/${row.tha_ihdas_parselno}`, areaText: getWktArea(thaWkt), centroid: getWktCentroid(thaWkt), opacity: baseOpacity });
             }
           } catch (e) { }
         }
 
-        // Tescilli THA sayfasından da bulmayı dene
         const match = thaData.find(t => String(t.adano).trim() === String(row.tha_ihdas_adano).trim() && String(t.parselno).trim() === String(row.tha_ihdas_parselno).trim());
         if (match && match.geom) {
           tescilliThaWkt = match.geom;
           try {
             if (parse(tescilliThaWkt)) {
-              features.push({ wkt: tescilliThaWkt, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${match.adano}/${match.parselno}`, areaText: getWktArea(tescilliThaWkt), centroid: getWktCentroid(tescilliThaWkt) }); // Green for THA
+              features.push({ id: row.id, wkt: tescilliThaWkt, color: '#16a34a', label: 'Tescilli THA', adaParsel: `${match.adano}/${match.parselno}`, areaText: getWktArea(tescilliThaWkt), centroid: getWktCentroid(tescilliThaWkt), opacity: baseOpacity }); // Green for THA
             }
           } catch (e) { }
         }
@@ -314,13 +341,15 @@ function App() {
           try {
             if (parse(row.geom)) {
               features.push({
+                id: row.id,
                 wkt: row.geom,
                 color: '#eab308',
                 label: 'Toki Satış',
                 adaParsel: `${row.adano || ''}/${row.parselno || ''}`,
                 areaText: getWktArea(row.geom),
                 centroid: getWktCentroid(row.geom),
-                popupData: row
+                popupData: row,
+                opacity: baseOpacity
               });
             } else { console.warn(`Toki Satış geometri bozuk/eksik: ${row.id}`); }
           } catch (e) { console.warn(`Toki Satış parse edilemedi: ${row.id}`); }
@@ -329,7 +358,7 @@ function App() {
     });
 
     setMapFeatures(features);
-  }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData]);
+  }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData, showCityParcels]);
 
   const mapPanelTitleInfo = useMemo(() => {
     if (checkedRowIds.size === 0) return undefined;
@@ -419,13 +448,17 @@ function App() {
 
         <RightPanelMap
           isOpen={isMapPanelOpen}
-          features={mapFeatures}
-          focusFeatures={mapFeatures}
-          titleInfo={mapPanelTitleInfo}
           onClose={() => {
             setIsMapPanelOpen(false);
+            setMapFeatures([]);
             setCheckedRowIds(new Set());
           }}
+          features={mapFeatures}
+          focusFeatures={mapFeatures.filter(f => f.id && checkedRowIds.has(String(f.id)) && !f.isHatched)} 
+          titleInfo={mapPanelTitleInfo}
+          showCityParcels={showCityParcels}
+          onToggleCityParcels={setShowCityParcels}
+          cityParcelsList={cityParcelsList}
         />
       </main>
 

@@ -19,6 +19,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 export interface MapFeature {
+  id?: string;
   wkt?: string;
   geoJson?: any;
   color: string;
@@ -28,6 +29,7 @@ export interface MapFeature {
   areaText?: string;
   centroid?: [number, number];
   popupData?: any;
+  opacity?: number;
 }
 
 interface RightPanelMapProps {
@@ -36,6 +38,9 @@ interface RightPanelMapProps {
   features: MapFeature[];
   focusFeatures?: MapFeature[];
   titleInfo?: string;
+  showCityParcels?: boolean;
+  onToggleCityParcels?: (show: boolean) => void;
+  cityParcelsList?: any[];
 }
 
 const ZoomTracker = ({ onZoomChange }: { onZoomChange: (z: number) => void }) => {
@@ -85,13 +90,15 @@ const MapController = ({ focusFeatures }: { focusFeatures?: { geoJson: any }[] }
   return null;
 };
 
-const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, titleInfo, onClose }) => {
+const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFeatures, titleInfo, onClose, showCityParcels, onToggleCityParcels, cityParcelsList }) => {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [parsedFeatures, setParsedFeatures] = useState<{geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number]}[]>([]);
+  const [parsedFeatures, setParsedFeatures] = useState<{id?: string, geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number], popupData?: any, opacity?: number}[]>([]);
   const [parsedFocusFeatures, setParsedFocusFeatures] = useState<{geoJson: any}[]>([]);
+  const [sidebarFocusFeature, setSidebarFocusFeature] = useState<{geoJson: any} | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(6);
   const [activeBaseLayer, setActiveBaseLayer] = useState<string>('Google Uydu');
   const [showLayers, setShowLayers] = useState<boolean>(window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true); // Add sidebar toggle state
 
   useEffect(() => {
     const handleResize = () => {
@@ -111,11 +118,12 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
   useEffect(() => {
     if (isOpen && features.length > 0) {
-      const parsed: {geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number], popupData?: any}[] = [];
+      const parsed: {id?: string, geoJson: any, color: string, label?: string, adaParsel?: string, isHatched?: boolean, areaText?: string, centroid?: [number, number], popupData?: any, opacity?: number}[] = [];
       features.forEach(f => {
         const geoJson = f.geoJson || (f.wkt ? parseWKT(f.wkt) : null);
         if (geoJson) {
           parsed.push({ 
+            id: String(f.id), // Ensure it's string
             geoJson, 
             color: f.color,
             label: f.label,
@@ -123,7 +131,8 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             isHatched: f.isHatched,
             areaText: f.areaText,
             centroid: f.centroid,
-            popupData: f.popupData
+            popupData: f.popupData,
+            opacity: f.opacity
           });
         }
       });
@@ -143,10 +152,19 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
         }
       });
       setParsedFocusFeatures(parsedFocus);
+      setSidebarFocusFeature(null); // Reset on new focus
     } else if (!isOpen) {
       setParsedFocusFeatures([]);
+      setSidebarFocusFeature(null);
     }
   }, [isOpen, focusFeatures]);
+
+  const handleSidebarClick = (id: string) => {
+    const feature = parsedFeatures.find(f => f.id === String(id) && !f.isHatched);
+    if (feature && feature.geoJson) {
+      setSidebarFocusFeature({ geoJson: feature.geoJson });
+    }
+  };
 
   // Dışarı tıklayınca kapanma iptal edildi, sadece kapatma butonu ile kapanacak.
 
@@ -185,16 +203,16 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
 
     return (
       <React.Fragment key={idx}>
-        <GeoJSON 
-          data={f.geoJson} 
-          pathOptions={{ 
-            color: f.color, 
-            weight: f.isHatched ? 2 : 3, 
-            opacity: 0.8, 
-            fillColor: f.isHatched ? 'url(#hatchPattern)' : f.color, 
-            fillOpacity: f.isHatched ? 0.8 : 0.2 
-          }} 
-        >
+          <GeoJSON 
+            data={f.geoJson} 
+            pathOptions={{ 
+              color: f.color, 
+              weight: f.isHatched ? 2 : (f.opacity === 1 || f.opacity === undefined ? 3 : 2), 
+              opacity: f.opacity !== undefined ? f.opacity : 0.8, 
+              fillColor: f.isHatched ? 'url(#hatchPattern)' : f.color, 
+              fillOpacity: f.opacity !== undefined ? Math.min(f.opacity, 0.4) : (f.isHatched ? 0.8 : 0.2) 
+            }} 
+          >
 
           <Popup className="custom-map-popup">
             <div className="tooltip-content" style={{ margin: 0, padding: '4px', textAlign: 'center' }}>
@@ -300,16 +318,28 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
           {titleInfo && <span style={{ fontSize: '13px', color: '#ffffff', opacity: 0.9, fontWeight: 500, lineHeight: 1.2 }}>{titleInfo}</span>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '-2px' }}>
+          {onToggleCityParcels && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '12px', fontWeight: 500, cursor: 'pointer', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '6px' }}>
+              <input 
+                type="checkbox" 
+                checked={showCityParcels || false} 
+                onChange={(e) => onToggleCityParcels(e.target.checked)} 
+                style={{ cursor: 'pointer' }}
+              />
+              İldeki Tüm Parseller
+            </label>
+          )}
           <button className="close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
       </div>
       
-      <div className={`map-container ${showLayers ? 'layers-open' : 'layers-closed'}`}>
-        {isOpen && (
-          <MapContainer 
-            center={[39.92077, 32.85411]} 
+      <div className="map-and-sidebar-wrapper" style={{ display: 'flex', flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <div className={`map-container ${showLayers ? 'layers-open' : 'layers-closed'}`} style={{ flex: 1, position: 'relative' }}>
+          {isOpen && (
+            <MapContainer 
+              center={[39.92077, 32.85411]} 
             zoom={6} 
             maxZoom={22}
             zoomDelta={0.5}
@@ -324,7 +354,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                 </pattern>
               </defs>
             </svg>
-            <MapController focusFeatures={parsedFocusFeatures} />
+            <MapController focusFeatures={sidebarFocusFeature ? [sidebarFocusFeature] : parsedFocusFeatures} />
             <ZoomTracker onZoomChange={handleZoomChange} />
             <div className="zoom-indicator" style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, color: '#374151', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', zIndex: 1000, border: '1px solid rgba(0,0,0,0.1)' }}>
               Zoom: {currentZoom.toFixed(1)}
@@ -374,6 +404,37 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
             </LayersControl>
           </MapContainer>
         )}
+        </div>
+
+        {/* City Parcels Sidebar */}
+        {showCityParcels && cityParcelsList && cityParcelsList.length > 0 && (
+          <div className={`city-parcels-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+            <div className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <span style={{ transform: isSidebarOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.3s' }}>▶</span>
+            </div>
+            
+            {isSidebarOpen && (
+              <div className="sidebar-content">
+                <div className="sidebar-header">
+                  <h4>İl Parselleri ({cityParcelsList.length})</h4>
+                </div>
+                <div className="sidebar-list">
+                  {cityParcelsList.map((parcel, idx) => (
+                    <div 
+                      key={parcel.id || idx} 
+                      className="sidebar-list-item"
+                      onClick={() => parcel.id && handleSidebarClick(parcel.id)}
+                    >
+                      <div className="parcel-location">{parcel.ilcead} - {parcel.mahallead}</div>
+                      <div className="parcel-ada">Ada/Parsel: {parcel.adaParsel}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <button 
           className="mobile-layers-toggle-btn"
           onClick={() => setShowLayers(!showLayers)}
