@@ -318,6 +318,10 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
     );
   };
 
+  const activeFocusFeatures = useMemo(() => {
+    return sidebarFocusFeature ? [sidebarFocusFeature] : parsedFocusFeatures;
+  }, [sidebarFocusFeature, parsedFocusFeatures]);
+
   // Group features
   const tescilliFeatures = parsedFeatures.filter(f => f.label === 'Tescilli THA');
   const mukerrerFeatures = parsedFeatures.filter(f => f.label === 'Mükerrer Parsel');
@@ -372,7 +376,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
                 </pattern>
               </defs>
             </svg>
-            <MapController focusFeatures={sidebarFocusFeature ? [sidebarFocusFeature] : parsedFocusFeatures} />
+            <MapController focusFeatures={activeFocusFeatures} />
             <MapStateTracker onStateChange={handleStateChange} />
             <div className="zoom-indicator" style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, color: '#374151', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', zIndex: 1000, border: '1px solid rgba(0,0,0,0.1)' }}>
               Zoom: {currentZoom.toFixed(1)}
@@ -428,7 +432,7 @@ const RightPanelMap: React.FC<RightPanelMapProps> = ({ isOpen, features, focusFe
         {showCityParcels && cityParcelsList && cityParcelsList.length > 0 && (
           <div className={`city-parcels-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
             <div className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-              <span style={{ transform: isSidebarOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.3s' }}>▶</span>
+              <span style={{ transform: isSidebarOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.3s' }}>◀</span>
             </div>
             
             {isSidebarOpen && (
