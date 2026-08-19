@@ -10,9 +10,9 @@ import { parseCSVString } from './utils/dataParsers';
 import type { ThaRecord, MukerrerRecord, TokiSatisRecord, ViewTab } from './types';
 import './App.css';
 
-export const THA_CSV_FILENAME = 'public/Tescil_THA_14.08.2026.csv';
-export const MUKERRER_CSV_FILENAME = 'public/MukerrerParseller_14.08.2026.csv';
-export const TOKI_SATIS_CSV_FILENAME = 'public/tha_toki_satis_birlestirilmis_18.08.2026.csv';
+export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
+export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis_18.08.2026.csv';
 
 export const extractDateFromFilename = (filename: string) => {
   const match = filename.match(/_(.+?)\.csv/i);
