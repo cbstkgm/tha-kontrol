@@ -1,4 +1,4 @@
-# Tescil Harici Alanlar (THA) Mükerrer Parsel ve Toki Satış Analizi
+# tha-makam Mükerrer Parsel ve Toki Satış Analizi
 
 Bu proje, tescil harici alanlar (THA) ile mükerrer parsellerin coğrafi analizlerini yapmak, kesişim alanlarını (intersection) hesaplamak ve Toki Satış kayıtlarını harita üzerinde interaktif olarak görüntülemek amacıyla geliştirilmiştir.
 

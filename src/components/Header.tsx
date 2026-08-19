@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
     };
   }, []);
 
-  let appTitle = "Tescil Harici Alanlar";
+  let appTitle = "tha-makam";
   if (activeTab === 'toki') appTitle = "THA Toki Satış";
   else if (activeTab === 'mukerrer') appTitle = "THA Mükerrer Parseller";
   else if (activeTab === 'tha') appTitle = "THA Tescil Edilen";

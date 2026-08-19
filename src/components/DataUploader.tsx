@@ -44,7 +44,7 @@ const DataUploader: React.FC<DataUploaderProps> = ({ onThaUpload, onMukerrerUplo
     <div className="uploader-container">
       <div className="uploader-header">
         <h2>Veri Yükleme</h2>
-        <p>Tescil Harici Alanlar ve Mükerrer Parsel oluşumları verilerini sisteme yükleyin.</p>
+        <p>tha-makam ve Mükerrer Parsel oluşumları verilerini sisteme yükleyin.</p>
       </div>
 
       {error && (
@@ -75,7 +75,7 @@ const DataUploader: React.FC<DataUploaderProps> = ({ onThaUpload, onMukerrerUplo
             <DatabaseIcon />
           </div>
           <h3>Tescil Edilen THA'lar</h3>
-          <p>Tescil edilen Tescil Harici Alanlar tablosunu CSV veya Excel olarak yükleyin.</p>
+          <p>Tescil edilen tha-makam tablosunu CSV veya Excel olarak yükleyin.</p>
           <div className="upload-btn-wrapper">
             <button className="upload-btn primary" disabled={loading}>
               <UploadCloud size={18} />
