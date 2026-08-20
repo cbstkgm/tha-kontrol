@@ -42,3 +42,7 @@ tha-kontrol reposu için build alıp yayınlayacağınız zaman terminale "npm r
 
 npm run build:makam
 npm run build:kontrol
+
+yada bu aşağıdaki kodu terminalde çalıştırman yeterli
+
+npm run publish:all
