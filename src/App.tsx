@@ -53,7 +53,7 @@ function App() {
     mukerrer: extractDateFromFilename(MUKERRER_CSV_FILENAME),
     toki: extractDateFromFilename(TOKI_SATIS_CSV_FILENAME)
   });
-  const [activeTab, setActiveTab] = useState<ViewTab>('toki');
+  const [activeTab, setActiveTab] = useState<ViewTab>(import.meta.env.VITE_SHOW_TOKI !== 'false' ? 'toki' : 'mukerrer');
   const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
 
   const [thaData, setThaData] = useState<ThaRecord[]>([]);
@@ -84,7 +84,7 @@ function App() {
         const [thaRes, mukerrerRes, tokiRes] = await Promise.all([
           fetch(import.meta.env.BASE_URL + THA_CSV_FILENAME),
           fetch(import.meta.env.BASE_URL + MUKERRER_CSV_FILENAME),
-          fetch(import.meta.env.BASE_URL + TOKI_SATIS_CSV_FILENAME)
+          import.meta.env.VITE_SHOW_TOKI !== 'false' ? fetch(import.meta.env.BASE_URL + TOKI_SATIS_CSV_FILENAME) : Promise.resolve(null)
         ]);
 
         if (thaRes.ok) {
@@ -101,7 +101,7 @@ function App() {
           setMukerrerData(dataWithIds);
         }
 
-        if (tokiRes.ok) {
+        if (tokiRes && tokiRes.ok) {
           const tokiText = await tokiRes.text();
           const parsedToki = await parseCSVString<TokiSatisRecord>(tokiText);
           const dataWithIds = parsedToki.map((row, i) => ({ ...row, id: `toki-${i}` }));

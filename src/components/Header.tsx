@@ -25,6 +25,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  const showToki = import.meta.env.VITE_SHOW_TOKI !== 'false';
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
@@ -38,8 +40,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
     };
   }, []);
 
-  let appTitle = "tha-makam";
-  if (activeTab === 'toki') appTitle = "THA Toki Satış";
+  let appTitle = showToki ? "tha-makam" : "tha-kontrol";
+  if (activeTab === 'toki' && showToki) appTitle = "THA Toki Satış";
   else if (activeTab === 'mukerrer') appTitle = "THA Mükerrer Parseller";
   else if (activeTab === 'tha') appTitle = "THA Tescil Edilen";
 
@@ -59,13 +61,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
           <Database size={18} />
           Mükerrer Parseller
         </button>
-        <button
-          className={`nav-btn ${activeTab === 'toki' ? 'active' : ''}`}
-          onClick={() => setActiveTab('toki')}
-        >
-          <Database size={18} />
-          Toki Satış
-        </button>
+        {showToki && (
+          <button
+            className={`nav-btn ${activeTab === 'toki' ? 'active' : ''}`}
+            onClick={() => setActiveTab('toki')}
+          >
+            <Database size={18} />
+            Toki Satış
+          </button>
+        )}
         <button
           className={`nav-btn ${activeTab === 'tha' ? 'active' : ''}`}
           onClick={() => setActiveTab('tha')}
@@ -109,13 +113,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, searchQuery, s
                 <Database size={16} />
                 Mükerrer Parseller
               </button>
-              <button
-                className={`mobile-dropdown-item ${activeTab === 'toki' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('toki'); setIsMobileMenuOpen(false); }}
-              >
-                <Database size={16} />
-                Toki Satış
-              </button>
+              {showToki && (
+                <button
+                  className={`mobile-dropdown-item ${activeTab === 'toki' ? 'active' : ''}`}
+                  onClick={() => { setActiveTab('toki'); setIsMobileMenuOpen(false); }}
+                >
+                  <Database size={16} />
+                  Toki Satış
+                </button>
+              )}
               <button
                 className={`mobile-dropdown-item ${activeTab === 'tha' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('tha'); setIsMobileMenuOpen(false); }}

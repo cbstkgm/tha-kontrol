@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:makam": "vite --mode makam",
+    "dev:kontrol": "vite --mode kontrol",
     "build": "tsc -b && vite build",
+    "build:makam": "tsc -b && vite build --mode makam",
+    "build:kontrol": "tsc -b && vite build --mode kontrol",
     "lint": "oxlint",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "publish:all": "bash yayinla.sh"
   },
   "dependencies": {
     "@turf/turf": "^7.3.5",

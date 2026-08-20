@@ -33,3 +33,12 @@ npm run dev
 ```
 
 > **Not:** Demo linki projeye aittir. Sistem `public` klasörü altındaki verileri asenkron olarak okuyarak haritaya işler.
+
+
+Nasıl Kullanacaksınız?
+
+tha-makam reposu için build alıp yayınlayacağınız zaman terminale "npm run build:makam" yazmalısınız.
+tha-kontrol reposu için build alıp yayınlayacağınız zaman terminale "npm run build:kontrol" yazmalısınız.
+
+npm run build:makam
+npm run build:kontrol
