@@ -81,17 +81,17 @@ function App() {
   useEffect(() => {
     const loadDefaults = async () => {
       try {
-        const [thaRes, mukerrerRes, tokiRes] = await Promise.all([
-          fetch(import.meta.env.BASE_URL + THA_CSV_FILENAME),
+        const [tokiRes, mukerrerRes, thaRes] = await Promise.all([
+          import.meta.env.VITE_SHOW_TOKI !== 'false' ? fetch(import.meta.env.BASE_URL + TOKI_SATIS_CSV_FILENAME) : Promise.resolve(null),
           fetch(import.meta.env.BASE_URL + MUKERRER_CSV_FILENAME),
-          import.meta.env.VITE_SHOW_TOKI !== 'false' ? fetch(import.meta.env.BASE_URL + TOKI_SATIS_CSV_FILENAME) : Promise.resolve(null)
+          fetch(import.meta.env.BASE_URL + THA_CSV_FILENAME)
         ]);
 
-        if (thaRes.ok) {
-          const thaText = await thaRes.text();
-          const parsedTha = await parseCSVString<ThaRecord>(thaText);
-          const dataWithIds = parsedTha.map((row, i) => ({ ...row, id: `tha-${i}` }));
-          setThaData(dataWithIds);
+        if (tokiRes && tokiRes.ok) {
+          const tokiText = await tokiRes.text();
+          const parsedToki = await parseCSVString<TokiSatisRecord>(tokiText);
+          const dataWithIds = parsedToki.map((row, i) => ({ ...row, id: `toki-${i}` }));
+          setTokiData(dataWithIds);
         }
 
         if (mukerrerRes.ok) {
@@ -101,11 +101,11 @@ function App() {
           setMukerrerData(dataWithIds);
         }
 
-        if (tokiRes && tokiRes.ok) {
-          const tokiText = await tokiRes.text();
-          const parsedToki = await parseCSVString<TokiSatisRecord>(tokiText);
-          const dataWithIds = parsedToki.map((row, i) => ({ ...row, id: `toki-${i}` }));
-          setTokiData(dataWithIds);
+        if (thaRes.ok) {
+          const thaText = await thaRes.text();
+          const parsedTha = await parseCSVString<ThaRecord>(thaText);
+          const dataWithIds = parsedTha.map((row, i) => ({ ...row, id: `tha-${i}` }));
+          setThaData(dataWithIds);
         }
       } catch (err) {
         console.error("Default veri yüklenemedi", err);
