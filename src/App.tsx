@@ -10,8 +10,8 @@ import { parseCSVString } from './utils/dataParsers';
 import type { ThaRecord, MukerrerRecord, TokiSatisRecord, ViewTab } from './types';
 import './App.css';
 
-export const THA_CSV_FILENAME = 'Tescil_THA_14.08.2026.csv';
-export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_14.08.2026.csv';
+export const THA_CSV_FILENAME = 'Tescil_THA_21.08.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_21.08.2026.csv';
 export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis_18.08.2026.csv';
 
 export const extractDateFromFilename = (filename: string) => {
@@ -214,7 +214,7 @@ function App() {
     let dataToProcess = [];
     if (showCityParcels && selectedCities.size > 0) {
       dataToProcess = currentData.filter((r: any) => r.ilad && selectedCities.has(r.ilad.toString().toLocaleLowerCase('tr-TR').trim()));
-      
+
       const list = dataToProcess.map((r: any) => ({
         id: r.id,
         ilad: r.ilad,
@@ -362,19 +362,19 @@ function App() {
 
   const mapPanelTitleInfo = useMemo(() => {
     if (checkedRowIds.size === 0) return undefined;
-    
+
     const currentData = activeTab === 'tha' ? thaData : (activeTab === 'mukerrer' ? mukerrerData : tokiData);
     const firstId = Array.from(checkedRowIds)[0];
     const row = currentData.find((r: any) => String(r.id) === firstId) as any;
-    
+
     if (!row) return undefined;
-    
+
     const il = row.ilad || '';
     const ilce = row.ilcead || '';
     const mah = row.mahallead || '';
     const ada = row.adano || row.tha_ihdas_adano || row.mukerrer_adano || '';
     const parsel = row.parselno || row.tha_ihdas_parselno || row.mukerrer_parselno || '';
-    
+
     return `${il} / ${ilce} - ${mah} | Ada/Parsel: ${ada}/${parsel}`;
   }, [checkedRowIds, activeTab, thaData, mukerrerData, tokiData]);
 
@@ -404,8 +404,8 @@ function App() {
         <div className="content-area">
           {activeTab === 'upload' && (
             <DataUploader
-              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setUpdateDates(prev => ({...prev, tha: extractDateFromFilename(filename) || prev.tha})); }}
-              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setUpdateDates(prev => ({...prev, mukerrer: extractDateFromFilename(filename) || prev.mukerrer})); }}
+              onThaUpload={(data, filename) => { setThaData(data); setActiveTab('tha'); if (filename) setUpdateDates(prev => ({ ...prev, tha: extractDateFromFilename(filename) || prev.tha })); }}
+              onMukerrerUpload={(data, filename) => { setMukerrerData(data); setActiveTab('mukerrer'); if (filename) setUpdateDates(prev => ({ ...prev, mukerrer: extractDateFromFilename(filename) || prev.mukerrer })); }}
             />
           )}
 
@@ -454,7 +454,7 @@ function App() {
             setCheckedRowIds(new Set());
           }}
           features={mapFeatures}
-          focusFeatures={mapFeatures.filter(f => f.id && checkedRowIds.has(String(f.id)) && !f.isHatched)} 
+          focusFeatures={mapFeatures.filter(f => f.id && checkedRowIds.has(String(f.id)) && !f.isHatched)}
           titleInfo={mapPanelTitleInfo}
           showCityParcels={showCityParcels}
           onToggleCityParcels={setShowCityParcels}
