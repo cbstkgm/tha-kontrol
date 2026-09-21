@@ -1,8 +1,8 @@
-# THA Kontrol
+# THA Makam
 
-Bu proje Çevre, Şehircilik ve İklim Değişikliği Bakanlığı için hazırlanmış THA Kontrol paneli projesidir. Veri kontrol, uyumsuzluk ve tescil takibi işlemleri için kullanılır.
+Bu proje Çevre, Şehircilik ve İklim Değişikliği Bakanlığı için hazırlanmış THA Makam paneli uygulamasıdır. Hazine Taşınmazları ile ilgili verilerin ve TOKİ Satış bilgilerinin yönetimini sağlar.
 
 ## Özellikler
-- Mükerrer parsellerin mekansal kesişimlerinin tespiti ve alan hesaplamaları
-- Tescilli Hazine Arazilerinin (THA) güncel durum takibi
-*(Not: Bu versiyonda TOKİ Satış verileri gizlenmiştir.)*
+- TOKİ Satış parsellerinin harita üzerinde görüntülenmesi ve filtreleme
+- Mükerrer parsellerin tespiti
+- Tescilli Hazine Arazilerinin (THA) takibi ve mekansal analizleri
