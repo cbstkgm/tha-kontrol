@@ -10,8 +10,8 @@ import { parseCSVString } from './utils/dataParsers';
 import type { ThaRecord, MukerrerRecord, TokiSatisRecord, ViewTab } from './types';
 import './App.css';
 
-export const THA_CSV_FILENAME = 'Tescil_THA_21.08.2026.csv';
-export const MUKERRER_CSV_FILENAME = 'MukerrerParseller_21.08.2026.csv';
+export const THA_CSV_FILENAME = 'Tescilli_Parseller_21.09.2026.csv';
+export const MUKERRER_CSV_FILENAME = 'mukerrer_parseller_21.09.2026.csv';
 export const TOKI_SATIS_CSV_FILENAME = 'tha_toki_satis_birlestirilmis_18.08.2026.csv';
 
 export const extractDateFromFilename = (filename: string) => {
@@ -69,6 +69,12 @@ function App() {
     }, 400); // 400ms debounce
     return () => clearTimeout(handler);
   }, [searchInputs]);
+
+  useEffect(() => {
+    if (import.meta.env.VITE_APP_TITLE) {
+      document.title = import.meta.env.VITE_APP_TITLE;
+    }
+  }, []);
 
   const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
   const [checkedRowIds, setCheckedRowIds] = useState<Set<string>>(new Set());

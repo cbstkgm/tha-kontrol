@@ -4,21 +4,21 @@
 COMMIT_MSG=${1:-"Makam ve Kontrol için otomatik toplu güncelleme"}
 
 echo "------------------------------------------------"
-echo "1. KAYNAK KODLAR KAYDEDILIYOR (Commit)"
 echo "------------------------------------------------"
+echo "1. KAYNAK KODLAR THA-MAKAM REPOSUNA GÖNDERİLİYOR"
+echo "------------------------------------------------"
+cp README-makam.md README.md
 git add .
-git commit -m "$COMMIT_MSG"
-
-echo ""
-echo "------------------------------------------------"
-echo "2. KAYNAK KODLAR tha-makam REPOSUNA GÖNDERİLİYOR"
-echo "------------------------------------------------"
+git commit -m "$COMMIT_MSG (Makam)"
 git push origin main
 
 echo ""
 echo "------------------------------------------------"
-echo "3. KAYNAK KODLAR tha-kontrol REPOSUNA GÖNDERİLİYOR"
+echo "2. KAYNAK KODLAR THA-KONTROL REPOSUNA GÖNDERİLİYOR"
 echo "------------------------------------------------"
+cp README-kontrol.md README.md
+git add README.md
+git commit -m "$COMMIT_MSG (Kontrol)"
 # 'kontrol' adında bir uzak bağlantı (remote) olup olmadığını kontrol et, yoksa ekle
 if ! git remote | grep -q "kontrol"; then
   git remote add kontrol https://github.com/cbstkgm/tha-kontrol.git
