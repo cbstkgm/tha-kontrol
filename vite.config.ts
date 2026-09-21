@@ -10,7 +10,7 @@ export default defineConfig({
         target: 'https://cbsservis.tkgm.gov.tr',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/tkgm-wms/, '/tkgm.ows/wms'),
-        auth: 'genelsunum:CbsSube+13579',
+        auth: 'genelsunum:616161çaykara',
         secure: false,
       }
     }
